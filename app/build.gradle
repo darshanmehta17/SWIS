@@ -8,6 +8,8 @@ android {
         applicationId "co.swisapp.swis"
         minSdkVersion 16
         targetSdkVersion 23
+        renderscriptTargetApi 19
+        renderscriptSupportModeEnabled true
         versionCode 1
         versionName "1.0"
     }
