@@ -33,6 +33,7 @@ dependencies {
     compile 'uk.co.chrisjenx:calligraphy:2.1.0'
     compile 'com.google.code.gson:gson:2.5'
     compile 'com.pkmmte.view:circularimageview:1.1'
+    compile 'com.jakewharton:butterknife:7.0.1'
 
 
 }
