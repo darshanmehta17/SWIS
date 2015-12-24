@@ -1,8 +1,6 @@
 package co.swisapp.swis.activity;
 
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -11,37 +9,29 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.JsonRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import co.swisapp.swis.R;
-
+import co.swisapp.swis.Constants ;
 public class SignupActivity extends AppCompatActivity implements View.OnClickListener{
 
-    public static final String SIGNUP_URL = "https://swisapp.co:55555/api/signup" ;
-    public String USERCHECK_URL ;
-    public static final String USERNAME = "username" ;
-    public static final String EMAIL = "email" ;
-    public static final String PASSWORD = "password" ;
 
-    private EditText ETusername ;
-    private EditText ETemail ;
-    private EditText ETpassword ;
-    private Button Bregister ;
+    public String USERCHECK_URL ;
+
+    private EditText etUserName;
+    private EditText etEmail;
+    private EditText etPassword;
+    private Button bRegister;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,13 +39,13 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.activity_signup);
 
         /*Declaration of all the UI elements with onClickListener*/
-        ETusername = (EditText) findViewById(R.id.username) ;
-        ETemail = (EditText) findViewById(R.id.email_id) ;
-        ETpassword = (EditText) findViewById(R.id.password) ;
-        Bregister = (Button) findViewById(R.id.register) ;
+        etUserName = (EditText) findViewById(R.id.username) ;
+        etEmail = (EditText) findViewById(R.id.email_id) ;
+        etPassword = (EditText) findViewById(R.id.password) ;
+        bRegister = (Button) findViewById(R.id.register) ;
 
-        Bregister.setOnClickListener(this);
-        ETusername.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        bRegister.setOnClickListener(this);
+        etUserName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if(!hasFocus){
@@ -69,22 +59,26 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
+    /*Extraction of data as inserted by the user from UI */
+    final String username = etUserName.getText().toString().trim() ;
+    final String email = etEmail.getText().toString().trim() ;
+    final String password = etPassword.getText().toString().trim() ;
+
+
+
     /*Function to handle the entire registration*/
     public void registration() throws JSONException {
 
-        /*Extraction of data as inserted by the user from UI */
-        final String username = ETusername.getText().toString().trim() ;
-        final String email = ETemail.getText().toString().trim() ;
-        final String password = ETpassword.getText().toString().trim() ;
+
 
         /*Setting parameters to POST call*/
         HashMap<String, String> params = new HashMap<>() ;
-        params.put(USERNAME, username) ;
-        params.put(EMAIL, email) ;
-        params.put(PASSWORD, password) ;
+        params.put(Constants.USERNAME, username) ;
+        params.put(Constants.EMAIL, email) ;
+        params.put(Constants.PASSWORD, password) ;
 
         /*Making a jsonObject request and handling response */
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, SIGNUP_URL, new JSONObject(params), new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, Constants.SIGNUP_URL, new JSONObject(params), new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try{
@@ -149,7 +143,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
     /*api call to username duplicates */
     private boolean usernameCheck(){
 
-        USERCHECK_URL = String.format("https://swisapp.co:55555/api/useravailable?username=%s", USERNAME);
+        USERCHECK_URL = String.format("https://swisapp.co:55555/api/useravailable?username=%s", username);
 
         JsonObjectRequest jsonRequest2 = new JsonObjectRequest(Request.Method.GET, USERCHECK_URL, new JSONObject(), new Response.Listener<JSONObject>() {
             @Override
@@ -183,7 +177,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
     /*method of the class view.OnClickListener that is implemented*/
     @Override
     public void onClick(View v) {
-        if(v == Bregister) {
+        if(v == bRegister) {
             try {
                 boolean check = usernameCheck() ;
                 if(check)
