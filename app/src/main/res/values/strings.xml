@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">SWIS</string>
+    <string name="password_hint">Password</string>
+    <string name="prompt_login">Login</string>
+    <string name="prompt_create_account">No account yet? Create one</string>
+    <string name="email_taken">Sorry, an Account with this Email is already created</string>
+    <string name="signup_password">New Password</string>
+    <string name="signup_register">Register</string>
+    <string name="signup_email">Email ID</string>
+    <string name="signup_username">Username</string>
+    <string name="username_taken">Username already taken, try another</string>
 </resources>

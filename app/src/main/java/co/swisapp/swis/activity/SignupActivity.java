@@ -61,6 +61,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
                 if(!hasFocus){
                     if(!usernameCheck()){
                            //Update UI to modify username
+                        Toast.makeText(getApplicationContext(), R.string.username_taken, Toast.LENGTH_LONG).show();
                     }
                 }
             }
