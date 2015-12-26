@@ -1,7 +1,5 @@
 package co.swisapp.swis.utility;
 
-import co.swisapp.swis.Constants;
-
 
 public class InputValidator {
 

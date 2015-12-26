@@ -1,4 +1,4 @@
-package co.swisapp.swis;
+package co.swisapp.swis.utility;
 
 public class Constants {
 
