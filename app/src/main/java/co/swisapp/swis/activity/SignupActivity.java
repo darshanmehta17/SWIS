@@ -22,7 +22,8 @@ import org.json.JSONObject;
 import java.util.HashMap;
 
 import co.swisapp.swis.R;
-import co.swisapp.swis.Constants ;
+import co.swisapp.swis.utility.Constants;
+
 public class SignupActivity extends AppCompatActivity implements View.OnClickListener{
 
 

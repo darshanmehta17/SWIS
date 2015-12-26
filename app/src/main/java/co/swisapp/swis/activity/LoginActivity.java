@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import butterknife.Bind;
@@ -16,28 +17,26 @@ import co.swisapp.swis.utility.InputValidator;
 
 public class LoginActivity extends AppCompatActivity {
 
-    @Bind(R.id.input_login_username)
     EditText etUserName;
 
-    @Bind(R.id.input_login_password)
     EditText etUserPassword;
 
-    @Bind(R.id.btn_login)
-    Button btLogin;
+    Button bLogin;
 
-    @OnClick(R.id.link_signup)
-    public void LaunchSignUp() {
-        //TODO : Link Sign Up
-    }
+    TextView tvSignUp;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        ButterKnife.bind(this);
+        etUserName = (EditText) findViewById(R.id.login_input_username);
+        etUserPassword = (EditText) findViewById(R.id.login_input_password);
+        bLogin = (Button) findViewById(R.id.login_button);
+        tvSignUp = (TextView) findViewById(R.id.login_link_signup);
 
-        btLogin.setOnClickListener(new View.OnClickListener() {
+        bLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startLogin();
@@ -49,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
     public void onLoginFailed() {
         Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
 
-        btLogin.setEnabled(true);
+        bLogin.setEnabled(true);
     }
 
     //Login Validation
@@ -83,7 +82,7 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        btLogin.setEnabled(false);
+        bLogin.setEnabled(false);
 
         final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
         progressDialog.setIndeterminate(true);
@@ -102,7 +101,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void onLoginSuccess() {
-        btLogin.setEnabled(true);
+        bLogin.setEnabled(true);
         finish();
     }
 

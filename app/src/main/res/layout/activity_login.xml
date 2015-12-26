@@ -18,7 +18,7 @@
         android:layout_marginBottom="8dp">
 
         <EditText
-            android:id="@+id/input_login_username"
+            android:id="@+id/login_input_username"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text"
@@ -34,7 +34,7 @@
         android:layout_marginBottom="8dp">
 
         <EditText
-            android:id="@+id/input_login_password"
+            android:id="@+id/login_input_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPassword"
@@ -43,8 +43,8 @@
     </android.support.design.widget.TextInputLayout>
 
     <android.support.v7.widget.AppCompatButton
-        android:id="@+id/btn_login"
-        android:layout_width="fill_parent"
+        android:id="@+id/login_button"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:layout_marginBottom="24dp"
@@ -52,7 +52,7 @@
         android:text="@string/prompt_login" />
 
     <TextView
-        android:id="@+id/link_signup"
+        android:id="@+id/login_link_signup"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
