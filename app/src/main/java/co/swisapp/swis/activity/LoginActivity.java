@@ -9,21 +9,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import co.swisapp.swis.R;
 import co.swisapp.swis.utility.InputValidator;
 
 public class LoginActivity extends AppCompatActivity {
 
-    EditText etUserName;
+    private EditText etUsername;
+    private EditText etPassword;
 
-    EditText etUserPassword;
+    private Button bLogin;
 
-    Button bLogin;
-
-    TextView tvSignUp;
+    private TextView tvSignUp;
 
 
     @Override
@@ -31,11 +27,16 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        etUserName = (EditText) findViewById(R.id.login_input_username);
-        etUserPassword = (EditText) findViewById(R.id.login_input_password);
-        bLogin = (Button) findViewById(R.id.login_button);
+        initialize();
+    }
+
+    private void initialize() {
+        etUsername = (EditText) findViewById(R.id.login_input_username);
+        etPassword = (EditText) findViewById(R.id.login_input_password);
+
         tvSignUp = (TextView) findViewById(R.id.login_link_signup);
 
+        bLogin = (Button) findViewById(R.id.login_button);
         bLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -51,25 +52,27 @@ public class LoginActivity extends AppCompatActivity {
         bLogin.setEnabled(true);
     }
 
-    //Login Validation
-
+    /**
+     * Validates login related fields
+     * @return a boolean {@code valid = true} if success, else {@code valid = false} if failure
+     */
     public boolean validate() {
 
         boolean valid = true;
-        String username = etUserName.getText().toString();
-        String password = etUserPassword.getText().toString();
+        String username = etUsername.getText().toString();
+        String password = etPassword.getText().toString();
 
         if (InputValidator.validate_username(username)) {
-            etUserName.setError(null);
+            etUsername.setError(null);
         } else {
-            etUserName.setError("Enter Valid User Name");
+            etUsername.setError("Enter Valid User Name");
             valid = false;
         }
 
         if (InputValidator.vaildate_pass(password)) {
-            etUserPassword.setError(null);
+            etPassword.setError(null);
         } else {
-            etUserPassword.setError("Enter Valid Password");
+            etPassword.setError("Enter Valid Password");
             valid = false;
         }
 

@@ -32,6 +32,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
     private EditText etUserName;
     private EditText etEmail;
     private EditText etPassword;
+
     private Button bRegister;
 
     @Override
@@ -39,25 +40,28 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
-        /*Declaration of all the UI elements with onClickListener*/
+        initialize();
+    }
+
+    private void initialize() {
         etUserName = (EditText) findViewById(R.id.username) ;
         etEmail = (EditText) findViewById(R.id.email_id) ;
         etPassword = (EditText) findViewById(R.id.password) ;
-        bRegister = (Button) findViewById(R.id.register) ;
 
+        bRegister = (Button) findViewById(R.id.register) ;
         bRegister.setOnClickListener(this);
+
         etUserName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if(!hasFocus){
                     if(!usernameCheck()){
-                           //Update UI to modify username
+                        //Update UI to modify username
                         Toast.makeText(getApplicationContext(), R.string.username_taken, Toast.LENGTH_LONG).show();
                     }
                 }
             }
         });
-
     }
 
     /*Extraction of data as inserted by the user from UI */
@@ -69,8 +73,6 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
 
     /*Function to handle the entire registration*/
     public void registration() throws JSONException {
-
-
 
         /*Setting parameters to POST call*/
         HashMap<String, String> params = new HashMap<>() ;
@@ -134,8 +136,6 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
 
     /* Method to handle errors returned by API */
     private void checkErrors() {
-
-
 
     }
 
