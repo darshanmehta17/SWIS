@@ -9,4 +9,9 @@
     <string name="signup_email">Email ID</string>
     <string name="signup_username">Username</string>
     <string name="username_taken">Username already taken, try another</string>
+    <string name="error_common">Sorry, we encountered an error, please try again.</string>
+    <string name="network_error">Sorry, there was an error fetching the data, please try again.</string>
+    <string name="invalid_Email">Please enter a valid Email ID.</string>
+    <string name="password_short">Password must be atleast 6 characters.</string>
+    <string name="password_contains_username">Password must not contain Username in it.</string>
 </resources>
