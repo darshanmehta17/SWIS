@@ -1,6 +1,9 @@
 package co.swisapp.swis.activity;
 
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -23,6 +26,7 @@ import java.util.HashMap;
 
 import co.swisapp.swis.R;
 import co.swisapp.swis.utility.Constants;
+
 
 public class SignupActivity extends AppCompatActivity implements View.OnClickListener{
     public String USERCHECK_URL ;
@@ -52,14 +56,19 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if(!hasFocus){
-                    if(!usernameCheck()){
-                           //Update UI to modify username
-                        etUserName.setBackgroundResource(R.drawable.signup_error_ui);
-                        Toast.makeText(getApplicationContext(), R.string.username_taken, Toast.LENGTH_SHORT).show();
+                    if(ConnectivityCheck()){
+                        if(!usernameCheck()){
+                            //Update UI to modify username
+                            etUserName.setBackgroundResource(R.drawable.signup_error_ui);
+                            Toast.makeText(getApplicationContext(), R.string.username_taken, Toast.LENGTH_SHORT).show();
+                        }
+                        else{
+                            etUserName.setBackgroundResource(R.drawable.signup_ok_ui);
+
+                        }
                     }
                     else{
-                        etUserName.setBackgroundResource(R.drawable.signup_ok_ui);
-
+                        Toast.makeText(getApplicationContext(), R.string.network_error, Toast.LENGTH_LONG).show();
                     }
                 }
             }
@@ -96,21 +105,37 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
             }
         });
 
+
+
     }
+
+    public boolean ConnectivityCheck(){
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE) ;
+        NetworkInfo networkinfo = cm.getActiveNetworkInfo() ;
+        return networkinfo.isConnected() ;
+    }
+
+
 
     /*method of view.OnClickListener that is implemented*/
     @Override
     public void onClick(View v) {
         if(v == bRegister) {
-            if(validityCheck()){
-                try {
-                    if(usernameCheck())
-                        registration();
-                } catch (JSONException e) {
-                    Toast.makeText(getApplicationContext(), R.string.error_common, Toast.LENGTH_LONG).show();
-                    e.printStackTrace();
+            if(ConnectivityCheck()) {
+                if (validityCheck()) {
+                    try {
+                        if (usernameCheck())
+                            registration();
+                    } catch (JSONException e) {
+                        Toast.makeText(getApplicationContext(), R.string.error_common, Toast.LENGTH_LONG).show();
+                        e.printStackTrace();
+                    }
                 }
             }
+            else{
+                Toast.makeText(getApplicationContext(), R.string.network_error, Toast.LENGTH_LONG).show();
+            }
+
         }
     }
 
