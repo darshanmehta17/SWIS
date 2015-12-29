@@ -4,6 +4,7 @@ package co.swisapp.swis.activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -24,18 +25,20 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
+import co.swisapp.swis.MainApplication;
 import co.swisapp.swis.R;
 import co.swisapp.swis.utility.Constants;
 
 
-public class SignupActivity extends AppCompatActivity implements View.OnClickListener{
-    public String USERCHECK_URL ;
+public class SignupActivity extends AppCompatActivity implements View.OnClickListener {
+    public String USERCHECK_URL;
     private EditText etUserName;
     private EditText etEmail;
     private EditText etPassword;
 
     private Button bRegister;
-    boolean value ;
+    boolean value;
+    MainApplication helper = MainApplication.getInstance() ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,11 +46,11 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.activity_signup);
 
         /*Declaration of all the UI elements with onClickListener*/
-        etUserName = (EditText) findViewById(R.id.username) ;
-        etEmail = (EditText) findViewById(R.id.email_id) ;
-        etPassword = (EditText) findViewById(R.id.password) ;
+        etUserName = (EditText) findViewById(R.id.username);
+        etEmail = (EditText) findViewById(R.id.email_id);
+        etPassword = (EditText) findViewById(R.id.password);
 
-        bRegister = (Button) findViewById(R.id.register) ;
+        bRegister = (Button) findViewById(R.id.register);
         bRegister.setOnClickListener(this);
 
         //API call as soon as Username added or changed to check uniqueness
@@ -55,19 +58,17 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
         etUserName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if(!hasFocus){
-                    if(ConnectivityCheck()){
-                        if(!usernameCheck()){
+                if (!hasFocus) {
+                    if (ConnectivityCheck()) {
+                        if (!usernameCheck()) {
                             //Update UI to modify username
                             etUserName.setBackgroundResource(R.drawable.signup_error_ui);
                             Toast.makeText(getApplicationContext(), R.string.username_taken, Toast.LENGTH_SHORT).show();
-                        }
-                        else{
+                        } else {
                             etUserName.setBackgroundResource(R.drawable.signup_ok_ui);
 
                         }
-                    }
-                    else{
+                    } else {
                         Toast.makeText(getApplicationContext(), R.string.network_error, Toast.LENGTH_LONG).show();
                     }
                 }
@@ -77,11 +78,10 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus) {
-                    if(!getEmailfromUI().contains("@")){
+                    if (!getEmailfromUI().contains("@")) {
                         etEmail.setBackgroundResource(R.drawable.signup_error_ui);
                         Toast.makeText(getApplicationContext(), R.string.invalid_Email, Toast.LENGTH_SHORT).show();
-                    }
-                    else
+                    } else
                         etEmail.setBackgroundResource(R.drawable.signup_ok_ui);
 
                 }
@@ -90,38 +90,33 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
         etPassword.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus){
+                if (!hasFocus) {
                     if (getPasswordfromUI().length() < 6) {
                         Toast.makeText(getApplicationContext(), R.string.password_short, Toast.LENGTH_SHORT).show();
                         etPassword.setBackgroundResource(R.drawable.signup_error_ui);
-                    }
-                    else if (getPasswordfromUI().contains(getUsernamefromUI())){
+                    } else if (getPasswordfromUI().contains(getUsernamefromUI())) {
                         Toast.makeText(getApplicationContext(), R.string.password_contains_username, Toast.LENGTH_SHORT).show();
                         etPassword.setBackgroundResource(R.drawable.signup_error_ui);
-                    }
-                    else
+                    } else
                         etPassword.setBackgroundResource(R.drawable.signup_ok_ui);
                 }
             }
         });
 
-
-
     }
 
-    public boolean ConnectivityCheck(){
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE) ;
-        NetworkInfo networkinfo = cm.getActiveNetworkInfo() ;
-        return networkinfo.isConnected() ;
+    public boolean ConnectivityCheck() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkinfo = cm.getActiveNetworkInfo();
+        return networkinfo.isConnected();
     }
-
 
 
     /*method of view.OnClickListener that is implemented*/
     @Override
     public void onClick(View v) {
-        if(v == bRegister) {
-            if(ConnectivityCheck()) {
+        if (v == bRegister) {
+            if (ConnectivityCheck()) {
                 if (validityCheck()) {
                     try {
                         if (usernameCheck())
@@ -131,8 +126,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
                         e.printStackTrace();
                     }
                 }
-            }
-            else{
+            } else {
                 Toast.makeText(getApplicationContext(), R.string.network_error, Toast.LENGTH_LONG).show();
             }
 
@@ -143,29 +137,31 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
     /*Function to handle the entire registration*/
     public void registration() throws JSONException {
 
+
+
         /*Setting parameters to POST call*/
-        HashMap<String, String> params = new HashMap<>() ;
-        params.put(Constants.USERNAME, getUsernamefromUI()) ;
-        params.put(Constants.EMAIL, getEmailfromUI()) ;
-        params.put(Constants.PASSWORD, getPasswordfromUI()) ;
+        HashMap<String, String> params = new HashMap<>();
+        params.put(Constants.USERNAME, getUsernamefromUI());
+        params.put(Constants.EMAIL, getEmailfromUI());
+        params.put(Constants.PASSWORD, getPasswordfromUI());
 
         /*Making a jsonObject request and handling response */
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, Constants.SIGNUP_URL, new JSONObject(params), new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                try{
+                try {
                     String data = response.getString("response");
 
-                    switch (data){
-                        case "success" :
+                    switch (data) {
+                        case "success":
                             //Intent to confirmation
                             break;
-                        case "invalid" :
+                        case "invalid":
                             // Please try again
-                            HandleError() ;
+                            HandleError();
                             break;
-                        case "emailtaken" :
-                            Log.i("Inside Log", "Email taken response" + response.toString()) ;
+                        case "emailtaken":
+                            Log.i("Inside Log", "Email taken response" + response.toString());
                             Toast.makeText(getApplicationContext(), R.string.email_taken, Toast.LENGTH_LONG).show();
 
                             break;
@@ -173,15 +169,15 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
                     }
 
 
-                }catch (JSONException e){
+                } catch (JSONException e) {
 
-                    Log.e("EXCEPTION", "JSON " + e) ;
+                    Log.e("EXCEPTION", "JSON " + e);
                     Toast.makeText(getApplicationContext(), R.string.network_error, Toast.LENGTH_LONG).show();
                 }
 
 
-                if(!response.toString().equals(" ")){
-                    Log.d("Registration response", "Response is" + response.toString()) ;
+                if (!response.toString().equals(" ")) {
+                    Log.d("Registration response", "Response is" + response.toString());
 
                 }
 
@@ -191,16 +187,17 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                Log.e("Response Error", "Error: " + error) ;
+                Log.e("Response Error", "Error: " + error);
                 Toast.makeText(getApplicationContext(), R.string.network_error, Toast.LENGTH_LONG).show();
             }
         });
 
 
-        /*Queue request of the generated string */
-        RequestQueue requestQueue = Volley.newRequestQueue(this) ;
-        requestQueue.add(jsonRequest) ;
+        helper.add(jsonRequest);
 
+        /*Queue request of the generated string */
+        /*RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(jsonRequest);*/
 
     }
 
@@ -212,20 +209,20 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
 
 
     /*Extraction of data as inserted by the user from UI */
-    public String getUsernamefromUI(){
-        return etUserName.getText().toString().trim() ;
+    public String getUsernamefromUI() {
+        return etUserName.getText().toString().trim();
     }
 
-    public String getEmailfromUI(){
-        return etEmail.getText().toString().trim() ;
+    public String getEmailfromUI() {
+        return etEmail.getText().toString().trim();
     }
 
-    public String getPasswordfromUI(){
-        return etPassword.getText().toString().trim() ;
+    public String getPasswordfromUI() {
+        return etPassword.getText().toString().trim();
     }
 
     /*api call to username duplicates */
-    private boolean usernameCheck(){
+    private boolean usernameCheck() {
 
         USERCHECK_URL = String.format("https://swisapp.co:55555/api/useravailable?username=%s", getUsernamefromUI());
 
@@ -233,37 +230,37 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onResponse(JSONObject response) {
                 try {
-                    value = response.getBoolean("available") ;
-                }
-                catch (JSONException e){
-                    Log.e("JSON Error", "Error: " + e) ;
+                    value = response.getBoolean("available");
+                } catch (JSONException e) {
+                    Log.e("JSON Error", "Error: " + e);
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                Log.e("Response Error", "Error: " + error) ;
-                value = false ;
+                Log.e("Response Error", "Error: " + error);
+                value = false;
 
             }
         });
 
-        /*Queue request of the generated string */
-        RequestQueue requestQueue = Volley.newRequestQueue(this) ;
-        requestQueue.add(jsonRequest2) ;
 
-        return  value ;
+        helper.add(jsonRequest2);
+        /*Queue request of the generated string */
+        /*RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(jsonRequest2);*/
+
+        return value;
     }
 
     private boolean validityCheck() {
 
-        String Email = getEmailfromUI() ;
+        String Email = getEmailfromUI();
 
-        if(!Email.contains("@") || getPasswordfromUI().length() < 6 || getPasswordfromUI().contains(getUsernamefromUI())) {
-            return false ;
-        }
-        else
-            return true ;
+        if (!Email.contains("@") || getPasswordfromUI().length() < 6 || getPasswordfromUI().contains(getUsernamefromUI())) {
+            return false;
+        } else
+            return true;
     }
 }

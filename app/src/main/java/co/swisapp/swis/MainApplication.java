@@ -2,13 +2,24 @@ package co.swisapp.swis;
 
 import android.app.Application;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
+
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 public class MainApplication  extends Application{
 
+    private RequestQueue requestQueue ;
+    private static MainApplication mainApplication ;
+    public static final String TAG = MainApplication.class.getName();
+
     @Override
     public void onCreate() {
         super.onCreate();
+
+        mainApplication = this ;
+        requestQueue = Volley.newRequestQueue(getApplicationContext()) ;
 
         /**
          * Calligraphy configuration initialise.
@@ -19,5 +30,21 @@ public class MainApplication  extends Application{
                         .setFontAttrId(R.attr.fontPath)
                         .build()
         );
+    }
+
+    public static synchronized MainApplication getInstance(){
+        return mainApplication ;
+    }
+
+    public RequestQueue getRequestQueue(){
+        return requestQueue ;
+    }
+
+    public <T> void add(Request<T> request)     {
+        request.setTag(TAG) ;
+    }
+
+    public void cancel(){
+        requestQueue.cancelAll(TAG);
     }
 }
