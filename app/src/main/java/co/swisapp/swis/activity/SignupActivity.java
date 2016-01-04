@@ -28,6 +28,7 @@ import java.util.HashMap;
 import co.swisapp.swis.MainApplication;
 import co.swisapp.swis.R;
 import co.swisapp.swis.utility.Constants;
+import co.swisapp.swis.utility.NetworkUtils;
 
 
 public class SignupActivity extends AppCompatActivity implements View.OnClickListener {
@@ -59,7 +60,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus) {
-                    if (ConnectivityCheck()) {
+                    if (NetworkUtils.isNetworkConnected(getApplicationContext())) {
                         if (!usernameCheck()) {
                             //Update UI to modify username
                             etUserName.setBackgroundResource(R.drawable.signup_error_ui);
@@ -105,18 +106,14 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
-    public boolean ConnectivityCheck() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkinfo = cm.getActiveNetworkInfo();
-        return networkinfo.isConnected();
-    }
+
 
 
     /*method of view.OnClickListener that is implemented*/
     @Override
     public void onClick(View v) {
         if (v == bRegister) {
-            if (ConnectivityCheck()) {
+            if (NetworkUtils.isNetworkConnected(getApplicationContext())) {
                 if (validityCheck()) {
                     try {
                         if (usernameCheck())
