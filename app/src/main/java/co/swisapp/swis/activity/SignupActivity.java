@@ -1,10 +1,5 @@
 package co.swisapp.swis.activity;
 
-
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -14,11 +9,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,12 +23,13 @@ import co.swisapp.swis.R;
 import co.swisapp.swis.utility.Constants;
 import co.swisapp.swis.utility.NetworkUtils;
 
-
 public class SignupActivity extends AppCompatActivity implements View.OnClickListener {
     public String USERCHECK_URL;
     private EditText etUserName;
     private EditText etEmail;
     private EditText etPassword;
+
+
 
     private Button bRegister;
     boolean value;
@@ -46,8 +40,31 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
-        /*Declaration of all the UI elements with onClickListener*/
-        etUserName = (EditText) findViewById(R.id.username);
+
+       /* LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
+        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+
+                    }
+
+                    @Override
+                    public void onCancel() {
+
+                    }
+
+                    @Override
+                    public void onError(FacebookException error) {
+
+                    }
+                });
+
+        */
+
+
+
+        /*Declaration of all the UI elements with onClickListener/onFocusChangeListener*/
+                etUserName = (EditText) findViewById(R.id.username);
         etEmail = (EditText) findViewById(R.id.email_id);
         etPassword = (EditText) findViewById(R.id.password);
 

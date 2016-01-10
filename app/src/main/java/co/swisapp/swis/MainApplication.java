@@ -1,10 +1,18 @@
 package co.swisapp.swis;
 
 import android.app.Application;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
+import android.util.Base64;
+import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
@@ -30,6 +38,10 @@ public class MainApplication  extends Application{
                         .setFontAttrId(R.attr.fontPath)
                         .build()
         );
+
+
+        printHashKey();
+
     }
 
     public static synchronized MainApplication getInstance(){
@@ -47,4 +59,25 @@ public class MainApplication  extends Application{
     public void cancel(){
         requestQueue.cancelAll(TAG);
     }
+
+
+    /*Printing the Hashkey to uniquely Identify Developer and App for FacebookAPI*/
+    public void printHashKey(){
+        try {
+            PackageInfo info = getPackageManager().getPackageInfo(
+                    "co.swisapp.swis",
+                    PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+
+        } catch (NoSuchAlgorithmException e) {
+
+        }
+
+    }
+
 }
