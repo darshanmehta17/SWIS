@@ -39,9 +39,6 @@ public class MainApplication  extends Application{
                         .build()
         );
 
-
-        printHashKey();
-
     }
 
     public static synchronized MainApplication getInstance(){
@@ -61,23 +58,6 @@ public class MainApplication  extends Application{
     }
 
 
-    /*Printing the Hashkey to uniquely Identify Developer and App for FacebookAPI*/
-    public void printHashKey(){
-        try {
-            PackageInfo info = getPackageManager().getPackageInfo(
-                    "co.swisapp.swis",
-                    PackageManager.GET_SIGNATURES);
-            for (Signature signature : info.signatures) {
-                MessageDigest md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
-                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
-            }
-        } catch (PackageManager.NameNotFoundException e) {
 
-        } catch (NoSuchAlgorithmException e) {
-
-        }
-
-    }
 
 }

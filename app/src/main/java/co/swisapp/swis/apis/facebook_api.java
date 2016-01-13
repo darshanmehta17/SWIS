@@ -1,4 +1,4 @@
-package values;
+package co.swisapp.swis.apis;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,7 +13,6 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
-import com.facebook.Profile;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
@@ -72,7 +71,7 @@ public class facebook_api extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        LoginButton loginButton = (LoginButton) view.findViewById(R.id.login_button) ;
+        LoginButton loginButton = (LoginButton) view.findViewById(R.id.login_button_facebook) ;
         loginButton.setReadPermissions("user_friends");
         loginButton.setFragment(this);
 

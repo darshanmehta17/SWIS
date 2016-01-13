@@ -36,7 +36,7 @@ public class LoginActivity extends AppCompatActivity {
 
         tvSignUp = (TextView) findViewById(R.id.login_link_signup);
 
-        bLogin = (Button) findViewById(R.id.login_button);
+        bLogin = (Button) findViewById(R.id.login_button_facebook);
         bLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

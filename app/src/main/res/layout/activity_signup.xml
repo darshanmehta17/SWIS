@@ -70,7 +70,7 @@
     <fragment
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:name="values.facebook_api"
+        android:name="co.swisapp.swis.apis.facebook_api"
         android:id="@+id/fragment"
         android:layout_marginTop="125dp"
         tools:layout="@layout/fragment_facebook_api"
