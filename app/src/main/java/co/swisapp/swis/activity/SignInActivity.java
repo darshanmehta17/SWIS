@@ -12,7 +12,7 @@ import android.widget.Toast;
 import co.swisapp.swis.R;
 import co.swisapp.swis.utility.InputValidator;
 
-public class LoginActivity extends AppCompatActivity {
+public class SignInActivity extends AppCompatActivity {
 
     private EditText etUsername;
     private EditText etPassword;
@@ -25,7 +25,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_sign_in);
 
         initialize();
     }
@@ -87,7 +87,7 @@ public class LoginActivity extends AppCompatActivity {
 
         bLogin.setEnabled(false);
 
-        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
+        final ProgressDialog progressDialog = new ProgressDialog(SignInActivity.this);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Verifying your details");
         progressDialog.show();
