@@ -35,6 +35,7 @@ public class MainSessionActivity extends FragmentActivity{
 
             }
 
+
             @Override
             public int getCount() {
                 return 3;
