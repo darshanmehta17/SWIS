@@ -36,4 +36,5 @@ dependencies {
     compile 'com.pkmmte.view:circularimageview:1.1'
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.facebook.android:facebook-android-sdk:4.6.0'
+    compile "com.android.support:support-v13:23.1.1"
 }
