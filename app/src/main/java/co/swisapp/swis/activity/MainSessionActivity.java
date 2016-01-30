@@ -3,6 +3,7 @@ package co.swisapp.swis.activity;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v13.app.FragmentCompat;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -24,9 +25,9 @@ public class MainSessionActivity extends FragmentActivity{
 
         viewPager = (ViewPager) findViewById(R.id.main_pager) ;
 
-        FragmentStatePagerAdapter adapter = new FragmentStatePagerAdapter(getSupportFragmentManager()) {
+        FragmentPagerAdapter adapter = new FragmentPagerAdapter(getFragmentManager()) {
             @Override
-            public Fragment getItem(int position) {
+            public android.app.Fragment getItem(int position) {
                 switch (position){
                     case 0: return new MainDiscoverFragment() ;
                     case 1: return new MainVideoFragment() ;

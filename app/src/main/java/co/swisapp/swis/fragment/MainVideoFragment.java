@@ -188,7 +188,7 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
         mButtonVideo = (FloatingActionButton) view.findViewById(R.id.video_capture);
         mButtonVideo.setOnClickListener(this);
-        view.findViewById(R.id.info).setOnClickListener(this);
+
     }
 
     @Override

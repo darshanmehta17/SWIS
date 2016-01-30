@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 
 import co.swisapp.swis.R;
 
-public class MainDiscoverFragment extends Fragment{
+public class MainDiscoverFragment extends android.app.Fragment{
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
