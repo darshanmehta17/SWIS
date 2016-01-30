@@ -6,10 +6,10 @@ android {
 
     defaultConfig {
         applicationId "co.swisapp.swis"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 23
-        renderscriptTargetApi 19
-        renderscriptSupportModeEnabled true
+        renderscriptTargetApi 21
+        renderscriptSupportModeEnabled false
         versionCode 1
         versionName "1.0"
     }
