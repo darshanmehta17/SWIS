@@ -5,11 +5,16 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-        <co.swisapp.swis.utility.AutoFitTextureView
+        <!--<co.swisapp.swis.utility.AutoFitTextureView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/texture"
-            android:layout_alignParentBottom="true" />
+            android:layout_alignParentBottom="true" />-->
+
+        <TextureView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/texture"/>
 
         <FrameLayout
             android:layout_width="match_parent"

@@ -30,7 +30,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v13.app.FragmentCompat;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -39,7 +38,6 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
 
 import java.io.File;
@@ -76,7 +74,8 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
 
-    private AutoFitTextureView mTextureView;
+    //private AutoFitTextureView mTextureView;
+    private TextureView textureView ;
     private FloatingActionButton mButtonVideo;
     private CameraDevice mCameraDevice;
     private CameraCaptureSession mPreviewSession;
@@ -122,8 +121,8 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
             mCameraDevice = cameraDevice;
             startPreview();
             mCameraOpenCloseLock.release();
-            if (null != mTextureView) {
-                configureTransform(mTextureView.getWidth(), mTextureView.getHeight());
+            if (null != textureView) {
+                configureTransform(textureView.getWidth(), textureView.getHeight());
             }
         }
 
@@ -185,7 +184,8 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
-        mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
+       // mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
+        textureView = (TextureView) view.findViewById(R.id.texture) ;
         mButtonVideo = (FloatingActionButton) view.findViewById(R.id.video_capture);
         mButtonVideo.setOnClickListener(this);
 
@@ -195,11 +195,18 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
     public void onResume() {
         super.onResume();
         startBackgroundThread();
-        if (mTextureView.isAvailable()) {
+        /*if (mTextureView.isAvailable()) {
             openCamera(mTextureView.getWidth(), mTextureView.getHeight());
         } else {
             mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
+        }*/
+        if(textureView.isAvailable()){
+            openCamera(textureView.getWidth(), textureView.getHeight());
+        }else {
+
+            textureView.setSurfaceTextureListener(mSurfaceTextureListener);
         }
+
     }
 
     @Override
@@ -319,11 +326,11 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
                     width, height, mVideoSize);
 
             int orientation = getResources().getConfiguration().orientation;
-            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            /*if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 mTextureView.setAspectRatio(mPreviewSize.getWidth(), mPreviewSize.getHeight());
             } else {
                 mTextureView.setAspectRatio(mPreviewSize.getHeight(), mPreviewSize.getWidth());
-            }
+            }*/
             configureTransform(width, height);
             mMediaRecorder = new MediaRecorder();
 
@@ -375,12 +382,12 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
      * Start the camera preview.
      */
     private void startPreview() {
-        if (null == mCameraDevice || !mTextureView.isAvailable() || null == mPreviewSize) {
+        if (null == mCameraDevice || !textureView.isAvailable() || null == mPreviewSize) {
             return;
         }
         try {
             setUpMediaRecorder();
-            SurfaceTexture texture = mTextureView.getSurfaceTexture();
+            SurfaceTexture texture = textureView.getSurfaceTexture();
             assert texture != null;
             texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
             mPreviewBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
@@ -440,7 +447,7 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
 
     private void configureTransform(int viewWidth, int viewHeight) {
         Activity activity = getActivity();
-        if (null == mTextureView || null == mPreviewSize || null == activity) {
+        if (null == textureView || null == mPreviewSize || null == activity) {
             return;
         }
         int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
@@ -458,7 +465,7 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
             matrix.postScale(scale, scale, centerX, centerY);
             matrix.postRotate(90 * (rotation - 2), centerX, centerY);
         }
-        mTextureView.setTransform(matrix);
+        textureView.setTransform(matrix);
     }
 
     private void setUpMediaRecorder() throws IOException {

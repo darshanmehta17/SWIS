@@ -13,6 +13,8 @@ import co.swisapp.swis.R;
 import co.swisapp.swis.fragment.MainDiscoverFragment;
 import co.swisapp.swis.fragment.MainUserFragment;
 import co.swisapp.swis.fragment.MainVideoFragment;
+import co.swisapp.swis.fragment.MainVideoFragmentCompat;
+import co.swisapp.swis.utility.Constants;
 
 public class MainSessionActivity extends FragmentActivity{
 
@@ -30,7 +32,12 @@ public class MainSessionActivity extends FragmentActivity{
             public android.app.Fragment getItem(int position) {
                 switch (position){
                     case 0: return new MainDiscoverFragment() ;
-                    case 1: return new MainVideoFragment() ;
+                    case 1:
+                        if (Constants.API_LEVEL >= 21) {
+                            return new MainVideoFragment() ;
+                        } else {
+                            return new MainVideoFragmentCompat() ;
+                        }
                     case 2: return new MainUserFragment() ;
                     default: return null ;
                 }
