@@ -2,6 +2,7 @@ package co.swisapp.swis.fragment;
 
 
 import android.app.Fragment;
+import android.content.res.Configuration;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
@@ -101,6 +102,12 @@ public class MainVideoFragmentCompat extends Fragment implements View.OnClickLis
         holder = cameraView.getHolder();
         holder.addCallback(this);
         holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+       //TODO: Check code again
+        int orientation = getResources().getConfiguration().orientation ;
+        if(orientation == Configuration.ORIENTATION_LANDSCAPE){
+            cameraView.getHolder().setSizeFromLayout();
+        }
 
         /*cameraView.setClickable(true);
         cameraView.setOnClickListener(this);*/

@@ -2,6 +2,7 @@ package co.swisapp.swis.fragment;
 
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -22,9 +23,12 @@ import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.MediaRecorder;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -53,7 +57,7 @@ import co.swisapp.swis.R;
 import co.swisapp.swis.utility.AutoFitTextureView;
 import co.swisapp.swis.utility.CameraHelper;
 
-
+@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class MainVideoFragment extends android.app.Fragment implements View.OnClickListener, FragmentCompat.OnRequestPermissionsResultCallback {
 
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
@@ -300,6 +304,7 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
         return true;
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void openCamera(int width, int height) {
         if (!hasPermissionsGranted(VIDEO_PERMISSIONS)) {
             requestVideoPermissions();
@@ -360,24 +365,6 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
         }
     }
 
-    private void closeCamera() {
-        try {
-            mCameraOpenCloseLock.acquire();
-            if (null != mCameraDevice) {
-                mCameraDevice.close();
-                mCameraDevice = null;
-            }
-            if (null != mMediaRecorder) {
-                mMediaRecorder.release();
-                mMediaRecorder = null;
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Interrupted while trying to lock camera closing.");
-        } finally {
-            mCameraOpenCloseLock.release();
-        }
-    }
-
     /**
      * Start the camera preview.
      */
@@ -421,6 +408,25 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+
+    private void closeCamera() {
+        try {
+            mCameraOpenCloseLock.acquire();
+            if (null != mCameraDevice) {
+                mCameraDevice.close();
+                mCameraDevice = null;
+            }
+            if (null != mMediaRecorder) {
+                mMediaRecorder.release();
+                mMediaRecorder = null;
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Interrupted while trying to lock camera closing.");
+        } finally {
+            mCameraOpenCloseLock.release();
         }
     }
 
@@ -489,7 +495,15 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
     }
 
     private File getVideoFile(Context context) {
-        return new File(context.getExternalFilesDir(null), "video.mp4");
+        File folder = new File(Environment.getExternalStorageDirectory() +  "/swisapp") ;
+
+        //return new File(context.getExternalFilesDir(null), "video.mp4");
+        if(!folder.exists()){
+            folder.mkdirs() ;
+        }
+        return new File(folder,  System.currentTimeMillis() + ".mp4") ;
+
+
     }
 
     private void startRecordingVideo() {
