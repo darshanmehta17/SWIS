@@ -14,7 +14,7 @@ import java.util.Locale;
 public class CameraHelper {
 
     public static final SparseIntArray ORIENTATIONS = new SparseIntArray();
-
+    public  String fileName ;
 
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
@@ -23,14 +23,21 @@ public class CameraHelper {
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
 
+    static public File getVideoFileInternal(Context context) {
 
+        File SWIS_DIR = context.getDir("Cache ", Context.MODE_PRIVATE) ;
 
-    CameraHelper(){
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
+                Locale.getDefault()).format(new Date());
+
+        return new File(SWIS_DIR.getPath() + File.separator + "VID_" + timeStamp + ".mp4") ;
 
 
     }
 
-    static public File getVideoFile(Context context) {
+
+
+    static public File getVideoFileExternal(Context context) {
         File folder = new File(Environment.getExternalStorageDirectory() +  "/swisapp") ;
 
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
@@ -40,8 +47,8 @@ public class CameraHelper {
         if(!folder.exists()){
             folder.mkdirs() ;
         }
-        return new File(folder.getPath() + File.separator + "VID_" + timeStamp + ".mp4") ;
-
+        return new File(folder.getPath() + File.separator + getVideoFileInternal(context).getAbsolutePath()) ;
+        // TODO: GET THE EXISTING FILE NAME
 
     }
 

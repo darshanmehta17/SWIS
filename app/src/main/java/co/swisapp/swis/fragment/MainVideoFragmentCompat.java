@@ -9,9 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
-import android.util.SparseIntArray;
 import android.view.LayoutInflater;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -36,7 +34,7 @@ public class MainVideoFragmentCompat extends Fragment implements View.OnClickLis
         CamcorderProfile cpHigh = CamcorderProfile
                 .get(CamcorderProfile.QUALITY_HIGH);
         recorder.setProfile(cpHigh);
-        recorder.setOutputFile(CameraHelper.getVideoFile(getActivity()).getAbsolutePath());
+        recorder.setOutputFile(CameraHelper.getVideoFileInternal(getActivity()).getAbsolutePath());
         recorder.setMaxDuration(24000);
         recorder.setMaxFileSize(5000000); // Approximately 5 megabytes
 

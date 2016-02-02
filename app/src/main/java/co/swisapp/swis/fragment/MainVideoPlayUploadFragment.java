@@ -2,31 +2,38 @@ package co.swisapp.swis.fragment;
 
 
 import android.app.Fragment;
-import android.app.VoiceInteractor;
 import android.graphics.SurfaceTexture;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.RecoverySystem;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 
 import co.swisapp.swis.R;
 import co.swisapp.swis.utility.CameraHelper;
+import co.swisapp.swis.utility.InputValidator;
 
 public class MainVideoPlayUploadFragment extends Fragment implements
         TextureView.SurfaceTextureListener, MediaPlayer.OnCompletionListener, View.OnClickListener{
 
     private MediaPlayer mMediaPlayer;
     private TextureView mPreview;
+    private ImageButton saveFileButton ;
 
     @Nullable
     @Override
@@ -41,6 +48,7 @@ public class MainVideoPlayUploadFragment extends Fragment implements
         mPreview = (TextureView) view.findViewById(R.id.play_texture);
         mPreview.setSurfaceTextureListener(this);
 
+        saveFileButton = (ImageButton) view.findViewById(R.id.save_button) ;
 
     }
 
@@ -50,7 +58,8 @@ public class MainVideoPlayUploadFragment extends Fragment implements
 
         try {
             mMediaPlayer= new MediaPlayer();
-            mMediaPlayer.setDataSource(CameraHelper.getVideoFile(getActivity()).getAbsolutePath());
+            mMediaPlayer.setDataSource(CameraHelper.getVideoFileInternal(getActivity()).getAbsolutePath());
+            // TODO: GET THE EXISTING FILE NAME
             mMediaPlayer.setSurface(s);
             mMediaPlayer.prepare();
             /*mMediaPlayer.setOnBufferingUpdateListener(this);
@@ -103,7 +112,7 @@ public class MainVideoPlayUploadFragment extends Fragment implements
 
             case R.id.upload: new uploadToServer() ;
                                 break;
-            case R.id.save:
+            case R.id.save_button: SaveExternal();
                                 break;
             case R.id.setLocation:
                                 break;
@@ -146,7 +155,7 @@ public class MainVideoPlayUploadFragment extends Fragment implements
 
 
             /* TODO: Set File Path properly */
-                File sourceFile = new File(CameraHelper.getVideoFile(getActivity()).getAbsolutePath());
+                File sourceFile = new File(CameraHelper.getVideoFileInternal(getActivity()).getAbsolutePath());
 
                 /*// Adding file data to http body
                 entity.addPart("image", new FileBody(sourceFile));
@@ -207,6 +216,32 @@ public class MainVideoPlayUploadFragment extends Fragment implements
         protected void onCancelled() {
             super.onCancelled();
         }
+    }
+
+    private void SaveExternal(){
+        File source = CameraHelper.getVideoFileInternal(getActivity()) ;
+        // TODO: GET THE EXISTING FILE NAME BOTH
+        File destination = CameraHelper.getVideoFileExternal(getActivity()) ;
+
+        try {
+            copyVideo(source, destination);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void copyVideo(File src, File dst) throws IOException{
+
+        FileInputStream in = new FileInputStream(src) ;
+        FileOutputStream out = new FileOutputStream(dst) ;
+
+        FileChannel inChannel = in.getChannel() ;
+        FileChannel outChannel = out.getChannel() ;
+        inChannel.transferTo(0, inChannel.size(), outChannel) ;
+        in.close();
+        out.close();
+        out.close();
     }
 
 }
