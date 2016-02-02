@@ -22,6 +22,7 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Bundle;
@@ -46,10 +47,13 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -60,7 +64,6 @@ import co.swisapp.swis.utility.CameraHelper;
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class MainVideoFragment extends android.app.Fragment implements View.OnClickListener, FragmentCompat.OnRequestPermissionsResultCallback {
 
-    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
 
     private static final String TAG = "Camera2VideoFragment";
     private static final int REQUEST_VIDEO_PERMISSIONS = 1;
@@ -71,18 +74,17 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
             Manifest.permission.RECORD_AUDIO,
     };
 
-    static {
-        ORIENTATIONS.append(Surface.ROTATION_0, 90);
-        ORIENTATIONS.append(Surface.ROTATION_90, 0);
-        ORIENTATIONS.append(Surface.ROTATION_180, 270);
-        ORIENTATIONS.append(Surface.ROTATION_270, 180);
-    }
+
+    /*mediaPlayer.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);*/
+
 
     //private AutoFitTextureView mTextureView;
-    private TextureView textureView ;
+    private TextureView textureView;
     private FloatingActionButton mButtonVideo;
     private CameraDevice mCameraDevice;
     private CameraCaptureSession mPreviewSession;
+
+
     private TextureView.SurfaceTextureListener mSurfaceTextureListener
             = new TextureView.SurfaceTextureListener() {
 
@@ -90,21 +92,33 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
         public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture,
                                               int width, int height) {
             openCamera(width, height);
+
+            Toast.makeText(getActivity(), "TextureAvailable", Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture,
                                                 int width, int height) {
             configureTransform(width, height);
+
+            //Toast.makeText(getActivity(), "TextureSizeChanged", Toast.LENGTH_SHORT).show();
+
         }
 
         @Override
         public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
-            return true;
+
+
+            //Toast.makeText(getActivity(), "TextureDestroyed", Toast.LENGTH_SHORT).show();
+
+            return false;
         }
 
         @Override
         public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
+            //Toast.makeText(getActivity(), "TextureUpdate", Toast.LENGTH_SHORT).show();
+
+
         }
 
     };
@@ -142,10 +156,10 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
             mCameraOpenCloseLock.release();
             cameraDevice.close();
             mCameraDevice = null;
-            Activity activity = getActivity();
+            /*Activity activity = getActivity();
             if (null != activity) {
                 activity.finish();
-            }
+            }*/
         }
 
     };
@@ -188,8 +202,8 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
-       // mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
-        textureView = (TextureView) view.findViewById(R.id.texture) ;
+        // mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
+        textureView = (TextureView) view.findViewById(R.id.texture);
         mButtonVideo = (FloatingActionButton) view.findViewById(R.id.video_capture);
         mButtonVideo.setOnClickListener(this);
 
@@ -199,18 +213,11 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
     public void onResume() {
         super.onResume();
         startBackgroundThread();
-        /*if (mTextureView.isAvailable()) {
-            openCamera(mTextureView.getWidth(), mTextureView.getHeight());
-        } else {
-            mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
-        }*/
-        if(textureView.isAvailable()){
+        if (textureView.isAvailable()) {
             openCamera(textureView.getWidth(), textureView.getHeight());
-        }else {
-
+        } else {
             textureView.setSurfaceTextureListener(mSurfaceTextureListener);
         }
-
     }
 
     @Override
@@ -304,7 +311,7 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
         return true;
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+
     private void openCamera(int width, int height) {
         if (!hasPermissionsGranted(VIDEO_PERMISSIONS)) {
             requestVideoPermissions();
@@ -339,7 +346,8 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
             configureTransform(width, height);
             mMediaRecorder = new MediaRecorder();
 
-            /*Context context = getContext() ;
+            Context context = getActivity() ;
+
 
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
@@ -350,7 +358,7 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
                 // to handle the case where the user grants the permission. See the documentation
                 // for ActivityCompat#requestPermissions for more details.
                 return;
-            }*/
+            }
             manager.openCamera(cameraId, mStateCallback, null);
         } catch (CameraAccessException e) {
             Toast.makeText(activity, "Cannot access the camera.", Toast.LENGTH_SHORT).show();
@@ -365,9 +373,9 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
         }
     }
 
-    /**
-     * Start the camera preview.
-     */
+
+
+
     private void startPreview() {
         if (null == mCameraDevice || !textureView.isAvailable() || null == mPreviewSize) {
             return;
@@ -482,29 +490,19 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-        mMediaRecorder.setOutputFile(getVideoFile(activity).getAbsolutePath());
+        mMediaRecorder.setOutputFile(CameraHelper.getVideoFile(activity).getAbsolutePath());
         mMediaRecorder.setVideoEncodingBitRate(10000000);
         mMediaRecorder.setVideoFrameRate(30);
         mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
         int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
-        int orientation = ORIENTATIONS.get(rotation);
+        int orientation = CameraHelper.ORIENTATIONS.get(rotation);
         mMediaRecorder.setOrientationHint(orientation);
         mMediaRecorder.prepare();
     }
 
-    private File getVideoFile(Context context) {
-        File folder = new File(Environment.getExternalStorageDirectory() +  "/swisapp") ;
 
-        //return new File(context.getExternalFilesDir(null), "video.mp4");
-        if(!folder.exists()){
-            folder.mkdirs() ;
-        }
-        return new File(folder,  System.currentTimeMillis() + ".mp4") ;
-
-
-    }
 
     private void startRecordingVideo() {
         try {
@@ -528,10 +526,22 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
         mMediaRecorder.reset();
         Activity activity = getActivity();
         if (null != activity) {
-            Toast.makeText(activity, "Video saved: " + getVideoFile(activity),
+            Toast.makeText(activity, "Video saved: " + CameraHelper.getVideoFile(activity),
                     Toast.LENGTH_SHORT).show();
         }
-        startPreview();
+        try{
+
+            /* TODO: Make Fragment from Adapter change to MainVideoPlayUploadFragment */
+
+
+
+        }catch (Throwable th){
+
+            startPreview();
+        }
+
+
+
     }
 
     /**

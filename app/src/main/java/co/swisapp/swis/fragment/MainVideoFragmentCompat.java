@@ -20,21 +20,14 @@ import android.view.ViewGroup;
 import java.io.IOException;
 
 import co.swisapp.swis.R;
+import co.swisapp.swis.utility.CameraHelper;
 
 public class MainVideoFragmentCompat extends Fragment implements View.OnClickListener, SurfaceHolder.Callback {
 
     MediaRecorder recorder;
     SurfaceHolder holder;
     boolean mIsRecordingVideo = false;
-    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
 
-
-    static {
-        ORIENTATIONS.append(Surface.ROTATION_0, 90);
-        ORIENTATIONS.append(Surface.ROTATION_90, 0);
-        ORIENTATIONS.append(Surface.ROTATION_180, 270);
-        ORIENTATIONS.append(Surface.ROTATION_270, 180);
-    }
 
     private void initRecorder() {
         recorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
@@ -43,7 +36,7 @@ public class MainVideoFragmentCompat extends Fragment implements View.OnClickLis
         CamcorderProfile cpHigh = CamcorderProfile
                 .get(CamcorderProfile.QUALITY_HIGH);
         recorder.setProfile(cpHigh);
-        recorder.setOutputFile("/sdcard/videocapture_example.mp4");
+        recorder.setOutputFile(CameraHelper.getVideoFile(getActivity()).getAbsolutePath());
         recorder.setMaxDuration(24000);
         recorder.setMaxFileSize(5000000); // Approximately 5 megabytes
 
