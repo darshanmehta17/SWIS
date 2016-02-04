@@ -9,6 +9,7 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Matrix;
 import android.graphics.RectF;
@@ -40,6 +41,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,7 +51,9 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import co.swisapp.swis.R;
+import co.swisapp.swis.activity.MainVideoPlayUploadActivity;
 import co.swisapp.swis.utility.CameraHelper;
+import co.swisapp.swis.utility.FileHelper;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class MainVideoFragment extends android.app.Fragment implements View.OnClickListener, FragmentCompat.OnRequestPermissionsResultCallback {
@@ -119,6 +123,8 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
     private boolean mIsRecordingVideo;
     private HandlerThread mBackgroundThread;
     private Handler mBackgroundHandler;
+    public String MainfileName;
+    public File MainfilePath;
 
     private Semaphore mCameraOpenCloseLock = new Semaphore(1);
 
@@ -480,7 +486,11 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-        mMediaRecorder.setOutputFile(CameraHelper.getVideoFileInternal(activity).getAbsolutePath());
+
+        MainfileName = FileHelper.generateVideoFileName() ;
+        MainfilePath = FileHelper.createVideoFile(activity, MainfileName, FileHelper.TYPE_INTERNAL);
+
+        mMediaRecorder.setOutputFile(MainfilePath.getAbsolutePath());
         mMediaRecorder.setVideoEncodingBitRate(10000000);
         mMediaRecorder.setVideoFrameRate(30);
         mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
@@ -490,6 +500,7 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
         int orientation = CameraHelper.ORIENTATIONS.get(rotation);
         mMediaRecorder.setOrientationHint(orientation);
         mMediaRecorder.prepare();
+
     }
 
 
@@ -516,17 +527,19 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
         mMediaRecorder.reset();
         Activity activity = getActivity();
         if (null != activity) {
-            Toast.makeText(activity, "Video saved: " + CameraHelper.getVideoFileInternal(activity),
+            Toast.makeText(activity, "Video saved: " + MainfileName,
                     Toast.LENGTH_SHORT).show();
             // TODO: GET THE EXISTING FILE NAME
-            Log.d("FILE NAME", " " + CameraHelper.getVideoFileInternal(activity)) ;
+            Log.d("FILE NAME", " " + MainfileName) ;
         }
         try{
 
             /* TODO: Make Fragment from Adapter change to MainVideoPlayUploadFragment */
+            /* TODO: Send intent data of filePath to MainVideoPlayUploadFragment */
 
-
-
+            Intent previewFragment = new Intent(getActivity(), MainVideoPlayUploadActivity.class);
+            previewFragment.putExtra("filePath", MainfilePath);
+            startActivity(previewFragment);
         }catch (Throwable th){
 
             startPreview();

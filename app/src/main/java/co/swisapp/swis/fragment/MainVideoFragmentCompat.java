@@ -19,8 +19,12 @@ import java.io.IOException;
 
 import co.swisapp.swis.R;
 import co.swisapp.swis.utility.CameraHelper;
+import co.swisapp.swis.utility.FileHelper;
 
 public class MainVideoFragmentCompat extends Fragment implements View.OnClickListener, SurfaceHolder.Callback {
+
+    public String MainfilePath ;
+    public String MainfileName ;
 
     MediaRecorder recorder;
     SurfaceHolder holder;
@@ -34,7 +38,12 @@ public class MainVideoFragmentCompat extends Fragment implements View.OnClickLis
         CamcorderProfile cpHigh = CamcorderProfile
                 .get(CamcorderProfile.QUALITY_HIGH);
         recorder.setProfile(cpHigh);
-        recorder.setOutputFile(CameraHelper.getVideoFileInternal(getActivity()).getAbsolutePath());
+
+
+        MainfileName = FileHelper.generateVideoFileName() ;
+        MainfilePath = FileHelper.createVideoFile(getActivity(), MainfileName, FileHelper.TYPE_INTERNAL ).getAbsolutePath() ;
+
+        recorder.setOutputFile(MainfilePath);
         recorder.setMaxDuration(24000);
         recorder.setMaxFileSize(5000000); // Approximately 5 megabytes
 
