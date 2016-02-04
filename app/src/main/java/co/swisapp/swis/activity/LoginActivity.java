@@ -2,60 +2,35 @@ package co.swisapp.swis.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 import co.swisapp.swis.R;
-import co.swisapp.swis.customview.MorphDemo;
+import co.swisapp.swis.customview.RecordButton;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements RecordButton.OnStopRecordListener, RecordButton.OnStartRecordListener {
 
-    MorphDemo morph;
+    private static final String TAG = "LoginActivity";
+
+    RecordButton recordButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        morph = (MorphDemo) findViewById(R.id.morph);
+        recordButton = (RecordButton) findViewById(R.id.login_record_button);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    for (int i = 20; i < 150; i++) {
+        recordButton.setOnStartRecordListener(this);
+        recordButton.setOnStopRecordListener(this);
+    }
 
-                        final int finalI = i;
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                morph.setRadius(finalI);
-                            }
-                        });
+    @Override
+    public void onStopRecord() {
+        Log.d(TAG, "onStopRecord: ");
+    }
 
-                        try {
-                            Thread.sleep(2);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    for (int i = 150; i >= 20; i--) {
-
-                        final int finalI = i;
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                morph.setRadius(finalI);
-                            }
-                        });
-
-                        try {
-                            Thread.sleep(2);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-        }).start();
+    @Override
+    public void onStartRecord() {
+        Log.d(TAG, "onStartRecord() called with: " + "");
     }
 }

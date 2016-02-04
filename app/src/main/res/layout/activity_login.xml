@@ -15,9 +15,9 @@
         <!--android:layout_width="match_parent"-->
         <!--android:layout_height="500dp" />-->
 
-    <co.swisapp.swis.customview.MorphDemo
-        android:id="@+id/morph"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    <co.swisapp.swis.customview.RecordButton
+        android:id="@+id/login_record_button"
+        android:layout_width="150dp"
+        android:layout_height="150dp"/>
 
 </RelativeLayout>
