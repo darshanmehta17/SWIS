@@ -162,7 +162,7 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
 
     private static Size chooseVideoSize(Size[] choices) {
         for (Size size : choices) {
-            if (size.getWidth() == size.getHeight() * 4 / 3 && size.getWidth() <= 1080) {
+            if (size.getWidth() == size.getHeight() * 4 / 3 && size.getWidth() <= 720) {
                 return size;
             }
         }
