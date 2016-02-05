@@ -29,7 +29,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v13.app.FragmentCompat;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
@@ -52,16 +51,18 @@ import java.util.concurrent.TimeUnit;
 
 import co.swisapp.swis.R;
 import co.swisapp.swis.activity.MainVideoPlayUploadActivity;
+import co.swisapp.swis.customview.RecordButton;
 import co.swisapp.swis.utility.CameraHelper;
 import co.swisapp.swis.utility.FileHelper;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-public class MainVideoFragment extends android.app.Fragment implements View.OnClickListener, FragmentCompat.OnRequestPermissionsResultCallback {
+public class MainVideoFragment extends android.app.Fragment implements RecordButton.OnStartRecordListener, RecordButton.OnStopRecordListener, FragmentCompat.OnRequestPermissionsResultCallback {
 
 
     private static final String TAG = "Camera2VideoFragment";
     private static final int REQUEST_VIDEO_PERMISSIONS = 1;
     private static final String FRAGMENT_DIALOG = "dialog";
+
 
     private static final String[] VIDEO_PERMISSIONS = {
             Manifest.permission.CAMERA,
@@ -74,7 +75,6 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
 
     //private AutoFitTextureView mTextureView;
     private TextureView textureView;
-    private FloatingActionButton mButtonVideo;
     private CameraDevice mCameraDevice;
     private CameraCaptureSession mPreviewSession;
 
@@ -87,7 +87,7 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
                                               int width, int height) {
             openCamera(width, height);
 
-            Toast.makeText(getActivity(), "TextureAvailable", Toast.LENGTH_SHORT).show();
+           // Toast.makeText(getActivity(), "TextureAvailable", Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -120,7 +120,6 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
     private Size mVideoSize;
     private CaptureRequest.Builder mPreviewBuilder;
     private MediaRecorder mMediaRecorder;
-    private boolean mIsRecordingVideo;
     private HandlerThread mBackgroundThread;
     private Handler mBackgroundHandler;
     public String MainfileName;
@@ -131,7 +130,7 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
     private CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback() {
 
         @Override
-        public void onOpened(CameraDevice cameraDevice) {
+        public void onOpened(@NonNull CameraDevice cameraDevice) {
             mCameraDevice = cameraDevice;
             startPreview();
             mCameraOpenCloseLock.release();
@@ -141,14 +140,14 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
         }
 
         @Override
-        public void onDisconnected(CameraDevice cameraDevice) {
+        public void onDisconnected(@NonNull CameraDevice cameraDevice) {
             mCameraOpenCloseLock.release();
             cameraDevice.close();
             mCameraDevice = null;
         }
 
         @Override
-        public void onError(CameraDevice cameraDevice, int error) {
+        public void onError(@NonNull CameraDevice cameraDevice, int error) {
             mCameraOpenCloseLock.release();
             cameraDevice.close();
             mCameraDevice = null;
@@ -172,7 +171,7 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
 
     private static Size chooseOptimalSize(Size[] choices, int width, int height, Size aspectRatio) {
         // Collect the supported resolutions that are at least as big as the preview Surface
-        List<Size> bigEnough = new ArrayList<Size>();
+        List<Size> bigEnough = new ArrayList<>();
         int w = aspectRatio.getWidth();
         int h = aspectRatio.getHeight();
         for (Size option : choices) {
@@ -198,10 +197,13 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
-        // mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
+
+        RecordButton mButtonVideo;
         textureView = (TextureView) view.findViewById(R.id.texture);
-        mButtonVideo = (FloatingActionButton) view.findViewById(R.id.video_capture);
-        mButtonVideo.setOnClickListener(this);
+        mButtonVideo = (RecordButton) view.findViewById(R.id.video_record_button);
+
+        mButtonVideo.setOnStartRecordListener(this);
+        mButtonVideo.setOnStopRecordListener(this);
 
     }
 
@@ -223,30 +225,12 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
         super.onPause();
     }
 
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.video_capture: {
-                if (mIsRecordingVideo) {
-                    stopRecordingVideo();
-                } else {
-                    startRecordingVideo();
-                }
-                break;
-            }
-        }
-    }
-
     private void startBackgroundThread() {
         mBackgroundThread = new HandlerThread("CameraBackground");
         mBackgroundThread.start();
         mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
     }
 
-    /**
-     * Stops the background thread and its {@link Handler}.
-     */
     private void stopBackgroundThread() {
         mBackgroundThread.quitSafely();
         try {
@@ -329,12 +313,16 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
             StreamConfigurationMap map = characteristics
                     .get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-            mVideoSize = chooseVideoSize(map.getOutputSizes(MediaRecorder.class));
-            mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
-                    width, height, mVideoSize);
+            if (map != null) {
+                mVideoSize = chooseVideoSize(map.getOutputSizes(MediaRecorder.class));
+            }
+            if (map != null) {
+                mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
+                        width, height, mVideoSize);
+            }
 
-            int orientation = getResources().getConfiguration().orientation;
-            /*if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            /*int orientation = getResources().getConfiguration().orientation;
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 mTextureView.setAspectRatio(mPreviewSize.getWidth(), mPreviewSize.getHeight());
             } else {
                 mTextureView.setAspectRatio(mPreviewSize.getHeight(), mPreviewSize.getWidth());
@@ -346,7 +334,7 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
 
 
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
+                //
                 //    ActivityCompat#requestPermissions
                 // here to request the missing permissions, and then overriding
                 //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
@@ -382,7 +370,7 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
             assert texture != null;
             texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
             mPreviewBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
-            List<Surface> surfaces = new ArrayList<Surface>();
+            List<Surface> surfaces = new ArrayList<>();
 
             Surface previewSurface = new Surface(texture);
             surfaces.add(previewSurface);
@@ -395,13 +383,13 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
             mCameraDevice.createCaptureSession(surfaces, new CameraCaptureSession.StateCallback() {
 
                 @Override
-                public void onConfigured(CameraCaptureSession cameraCaptureSession) {
+                public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
                     mPreviewSession = cameraCaptureSession;
                     updatePreview();
                 }
 
                 @Override
-                public void onConfigureFailed(CameraCaptureSession cameraCaptureSession) {
+                public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
                     Activity activity = getActivity();
                     if (null != activity) {
                         Toast.makeText(activity, "Failed", Toast.LENGTH_SHORT).show();
@@ -411,7 +399,7 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
         } catch (CameraAccessException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            e.getMessage() ;
         }
     }
 
@@ -492,7 +480,7 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
 
         mMediaRecorder.setOutputFile(MainfilePath.getAbsolutePath());
         mMediaRecorder.setVideoEncodingBitRate(10000000);
-        mMediaRecorder.setVideoFrameRate(30);
+        mMediaRecorder.setVideoFrameRate(15);
         mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
@@ -505,53 +493,34 @@ public class MainVideoFragment extends android.app.Fragment implements View.OnCl
 
 
 
-    private void startRecordingVideo() {
+    @Override
+    public void onStartRecord() {
         try {
-            // UI
-            //mButtonVideo.setText(R.string.stop);
-            mIsRecordingVideo = true;
-
-            // Start recording
             mMediaRecorder.start();
         } catch (IllegalStateException e) {
             e.printStackTrace();
         }
     }
 
-    private void stopRecordingVideo() {
-        // UI
-        mIsRecordingVideo = false;
-        //mButtonVideo.setText(R.string.record);
-        // Stop recording
+    @Override
+    public void onStopRecord() {
         mMediaRecorder.stop();
         mMediaRecorder.reset();
         Activity activity = getActivity();
         if (null != activity) {
             Toast.makeText(activity, "Video saved: " + MainfileName,
                     Toast.LENGTH_SHORT).show();
-            // TODO: GET THE EXISTING FILE NAME
             Log.d("FILE NAME", " " + MainfileName) ;
         }
         try{
-
-            /* TODO: Make Fragment from Adapter change to MainVideoPlayUploadFragment */
-            /* TODO: Send intent data of filePath to MainVideoPlayUploadFragment */
-
             Intent previewFragment = new Intent(getActivity(), MainVideoPlayUploadActivity.class);
             previewFragment.putExtra("filePath", MainfilePath);
             startActivity(previewFragment);
         }catch (Throwable th){
-
             startPreview();
         }
-
-
-
     }
 
-    /**
-     * Compares two {@code Size}s based on their areas.
-     */
     static class CompareSizesByArea implements Comparator<Size> {
 
         @Override

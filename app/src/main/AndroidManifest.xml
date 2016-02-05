@@ -44,12 +44,6 @@
         <activity
             android:name=".activity.SignupActivity"
             android:screenOrientation="portrait">
-                <intent-filter>
-                    <action android:name="android.intent.action.MAIN" />
-
-                    <category android:name="android.intent.category.LAUNCHER" />
-                </intent-filter>
-
         </activity>
 
         <activity
@@ -62,6 +56,22 @@
             android:launchMode="singleTask">
 
         </activity>
+        <activity
+                android:name=".activity.MainSessionActivity"
+                android:screenOrientation="portrait"
+                android:windowSoftInputMode="adjustPan">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
+        <activity android:name=".activity.MainVideoPlayUploadActivity"
+            android:screenOrientation="portrait">
+
+        </activity>
+
 
     </application>
 

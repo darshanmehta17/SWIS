@@ -10,6 +10,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
@@ -41,49 +42,10 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
     private MediaPlayer mMediaPlayer;
     private TextureView mPreview;
     private ImageButton saveFileButton ;
+    private ImageButton uploadFile ;
     private static final String TAG = "UploadServiceDemo";
     private static final String USER_AGENT = "UploadServiceDemo/" + BuildConfig.VERSION_NAME;
     private File FilePathIntent ;
-
-    private final UploadServiceBroadcastReceiver uploadServiceBroadcastReceiver =
-            new UploadServiceBroadcastReceiver(){
-
-                @Override
-                public void register(Context context) {
-                    super.register(context);
-                }
-
-                @Override
-                public void unregister(Context context) {
-                    super.unregister(context);
-                }
-
-                @Override
-                public void onProgress(String uploadId, int progress) {
-                    super.onProgress(uploadId, progress);
-                }
-
-                @Override
-                public void onProgress(String uploadId, long uploadedBytes, long totalBytes) {
-                    super.onProgress(uploadId, uploadedBytes, totalBytes);
-                }
-
-                @Override
-                public void onError(String uploadId, Exception exception) {
-                    super.onError(uploadId, exception);
-
-                }
-
-                @Override
-                public void onCompleted(String uploadId, int serverResponseCode, byte[] serverResponseBody) {
-                    super.onCompleted(uploadId, serverResponseCode, serverResponseBody);
-                }
-
-                @Override
-                public void onCancelled(String uploadId) {
-                    super.onCancelled(uploadId);
-                }
-            };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -96,6 +58,7 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
         mPreview.setSurfaceTextureListener(this);
 
         saveFileButton = (ImageButton)findViewById(R.id.save_button) ;
+        uploadFile = (ImageButton)findViewById(R.id.upload) ;
 
         Intent i = getIntent() ;
         FilePathIntent = (File)i.getExtras().get("filePath");
@@ -114,11 +77,11 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
         try {
             mMediaPlayer= new MediaPlayer();
             mMediaPlayer.setDataSource(FilePathIntent.getAbsolutePath());
-            // TODO: GET THE EXISTING FILE NAME
+
             mMediaPlayer.setSurface(s);
             mMediaPlayer.prepare();
-            /*mMediaPlayer.setOnBufferingUpdateListener(this);
 
+            /*mMediaPlayer.setOnBufferingUpdateListener(this);
             mMediaPlayer.setOnPreparedListener(this);
             mMediaPlayer.setOnVideoSizeChangedListener(this);*/
 
@@ -165,21 +128,13 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
     public void onClick(View v) {
         switch (v.getId()){
 
-            case R.id.upload:  ;
+            case R.id.upload: MultiPartUpload();
                                 break;
             case R.id.save_button: SaveExternal();
                                 break;
             case R.id.setLocation:
                                 break;
-
-            default:
-                return;
-
-
         }
-    }
-
-    private void addUploadToList(String uploadID, String filename) {
     }
 
     void MultiPartUpload(){
@@ -199,15 +154,16 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
                     .setMaxRetries(3)
                     .startUpload();
 
-            addUploadToList(uploadID,filename);
+
 
             // these are the different exceptions that may be thrown
         } catch (FileNotFoundException exc) {
             exc.printStackTrace();
         } catch (IllegalArgumentException exc) {
-            exc.printStackTrace();
+            Log.d("ERR", exc.getMessage() + " ") ;
+
         } catch (MalformedURLException exc) {
-            exc.printStackTrace();
+            Log.d("ERR", exc.getMessage() ) ;
         }
     }
 
@@ -239,7 +195,6 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
 
     private void SaveExternal(){
         File source = FilePathIntent ;
-        // TODO: GET THE EXISTING FILE NAME BOTH
         File destination = FileHelper.createVideoFile(getApplicationContext(), FileHelper.generateVideoFileName(), FileHelper.TYPE_EXTERNAL);
 
         try {
@@ -273,9 +228,9 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
     }
 
 
-    //If we need to implement
+    /*//If we need to implement
     void onCancelUploadClick(String uploadId) {
         UploadService.stopUpload(uploadId);
-    }
+    }*/
 
 }

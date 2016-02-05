@@ -23,13 +23,11 @@
             android:paddingBottom="15dp"
             android:paddingTop="15dp">
 
-            <android.support.design.widget.FloatingActionButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:id="@+id/video_capture"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true" />
+            <co.swisapp.swis.customview.RecordButton
+                android:id="@+id/video_record_button"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_gravity="center" />
         </FrameLayout>
 
 

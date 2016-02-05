@@ -11,7 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class CameraHelper {
+public abstract class CameraHelper {
 
     public static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     public String timeStamp ;
