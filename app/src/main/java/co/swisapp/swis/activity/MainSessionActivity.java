@@ -36,12 +36,12 @@ public class MainSessionActivity extends FragmentActivity{
             public android.app.Fragment getItem(int position) {
                 switch (position){
                     case 0: return new MainDiscoverFragment() ;
-                    case 1:
-                        if (Constants.API_LEVEL >= 21) {
+                    case 1: return new MainVideoFragmentCompat();
+                        /*if (Constants.API_LEVEL >= 21) {
                             return new MainVideoFragment() ;
                         } else {
                             return new MainVideoFragmentCompat() ;
-                        }
+                        }*/
                     case 2: return new MainUserFragment() ;
                     default: return null ;
                 }

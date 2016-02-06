@@ -1,85 +1,41 @@
 package co.swisapp.swis.fragment;
 
-
+import android.app.Activity;
 import android.app.Fragment;
-import android.content.res.Configuration;
-import android.media.CamcorderProfile;
+import android.content.Intent;
+import android.graphics.SurfaceTexture;
+import android.hardware.Camera;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import java.io.File;
 import java.io.IOException;
 
 import co.swisapp.swis.R;
+import co.swisapp.swis.activity.MainVideoPlayUploadActivity;
 import co.swisapp.swis.customview.RecordButton;
 import co.swisapp.swis.utility.FileHelper;
 
+@SuppressWarnings("deprecation")
 public class MainVideoFragmentCompat extends Fragment
-        implements RecordButton.OnStartRecordListener, RecordButton.OnStopRecordListener, SurfaceHolder.Callback {
+        implements TextureView.SurfaceTextureListener,
+        RecordButton.OnStartRecordListener, RecordButton.OnStopRecordListener{
 
-    public String MainfilePath ;
-    public String MainfileName ;
-
-    MediaRecorder recorder;
-    SurfaceHolder holder;
-    boolean mIsRecordingVideo = false;
-
-
-    private void initRecorder() {
-        recorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
-        recorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
-
-        CamcorderProfile cpHigh = CamcorderProfile
-                .get(CamcorderProfile.QUALITY_HIGH);
-        recorder.setProfile(cpHigh);
-
-
-        MainfileName = FileHelper.generateVideoFileName() ;
-        MainfilePath = FileHelper.createVideoFile(getActivity(), MainfileName, FileHelper.TYPE_INTERNAL ).getAbsolutePath() ;
-
-        recorder.setOutputFile(MainfilePath);
-        recorder.setMaxDuration(24000);
-        recorder.setMaxFileSize(5000000); // Approximately 5 megabytes
-
-
-    }
-
-    private void prepareRecorder() {
-        recorder.setPreviewDisplay(holder.getSurface());
-        try {
-            recorder.prepare();
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-            Log.d("prepareRecorder", "IllegalStateException" + e) ;
-        } catch (IOException e) {
-            Log.d("prepareRecorder", "IOException" + e) ;
-
-        }
-    }
-
-    /*public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.video_capture_compat: {
-                if (mIsRecordingVideo) {
-                    recorder.stop();
-                    mIsRecordingVideo = false;
-
-                    initRecorder();
-                    prepareRecorder();
-
-                } else {
-                    mIsRecordingVideo = true;
-                    recorder.start();
-                }
-            }
-        }
-    }*/
+    private TextureView textureView ;
+    private RecordButton recordButton ;
+    private Camera camera ;
+    private MediaRecorder mediaRecorder ;
+    /*private Thread thread1 ;*/
+    private String MainfileName ;
+    private File MainfilePath ;
+    private SurfaceTexture surfaceTexture ;
 
     @Nullable
     @Override
@@ -91,83 +47,114 @@ public class MainVideoFragmentCompat extends Fragment
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        recorder = new MediaRecorder();
-        initRecorder();
+        textureView = (TextureView) view.findViewById(R.id.textureview_compat) ;
+        recordButton = (RecordButton) view.findViewById(R.id.video_record_button_compat) ;
 
-        SurfaceView cameraView = (SurfaceView) view.findViewById(R.id.surfaceview) ;
-        RecordButton recordButton = (RecordButton) view.findViewById(R.id.video_record_button_compat) ;
-
-        holder = cameraView.getHolder();
-        holder.addCallback(this);
-        //noinspection deprecation
-        holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-
-       //TODO: Check code again
-        int orientation = getResources().getConfiguration().orientation ;
-        if(orientation == Configuration.ORIENTATION_LANDSCAPE){
-            cameraView.getHolder().setSizeFromLayout();
-        }
-
-        recordButton.setOnStopRecordListener(this);
+        recordButton.setOnStartRecordListener(this);
         recordButton.setOnStopRecordListener(this);
 
+        textureView.setSurfaceTextureListener(this);
+
+
     }
 
-    public void surfaceCreated(SurfaceHolder holder) {
-        prepareRecorder();
+    @Override
+    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+        surfaceTexture = surface ;
+
+        setupPreview();
+
     }
-    public void surfaceChanged(SurfaceHolder holder, int format, int width,
-                               int height) {
+
+    @Override
+    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+
     }
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        if (mIsRecordingVideo) {
-            recorder.stop();
-            mIsRecordingVideo = false;
-        }
-        recorder.release();
+
+    @Override
+    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+        camera.stopPreview();
+        camera.release();
+        return true;
+    }
+
+    @Override
+    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+
     }
 
     @Override
     public void onStartRecord() {
-        mIsRecordingVideo = true;
-        recorder.start();
+        Log.d("CHECK", "function onStartRecording") ;
+
+        MainfileName = FileHelper.generateVideoFileName() ;
+        MainfilePath = FileHelper.createVideoFile(getActivity(), MainfileName, FileHelper.TYPE_INTERNAL);
+
+        mediaRecorder = new MediaRecorder() ;
+        try {
+            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+            mediaRecorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
+
+            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+
+            mediaRecorder.setOutputFile(MainfilePath.getAbsolutePath());
+            mediaRecorder.setVideoEncodingBitRate(10000000);
+            mediaRecorder.setVideoFrameRate(15);
+
+            camera.unlock();
+            mediaRecorder.setCamera(camera);
+
+            mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+
+
+            mediaRecorder.prepare();
+        } catch (IOException e) {
+            Log.d("CHECK", "Error message" + e.getMessage()) ;
+        } catch (IllegalStateException ise){
+            Log.d("CHECK", "Error message:" + ise.getMessage()) ;
+        }
+        mediaRecorder.start();
+
+
     }
 
     @Override
     public void onStopRecord() {
-        recorder.stop();
-        mIsRecordingVideo = false;
-
-        initRecorder();
-        prepareRecorder();
-    }
-
-/*
-    private void configureTransform(int viewWidth, int viewHeight) {
+        mediaRecorder.stop();
+        mediaRecorder.reset();
         Activity activity = getActivity();
-        if (null == cameraView || null == mPreviewSize || null == activity) {
-            return;
+        if (null != activity) {
+            Toast.makeText(activity, "Video saved: " + MainfileName,
+                    Toast.LENGTH_SHORT).show();
+            Log.d("FILE NAME", " " + MainfileName) ;
         }
-        int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
-        Matrix matrix = new Matrix();
-        RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
-        RectF bufferRect = new RectF(0, 0, mPreviewSize.getHeight(), mPreviewSize.getWidth());
-        float centerX = viewRect.centerX();
-        float centerY = viewRect.centerY();
-        if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
-            bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
-            matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
-            float scale = Math.max(
-                    (float) viewHeight / mPreviewSize.getHeight(),
-                    (float) viewWidth / mPreviewSize.getWidth());
-            matrix.postScale(scale, scale, centerX, centerY);
-            matrix.postRotate(90 * (rotation - 2), centerX, centerY);
+        try{
+            Intent previewFragment = new Intent(getActivity(), MainVideoPlayUploadActivity.class);
+            previewFragment.putExtra("filePath", MainfilePath);
+            startActivity(previewFragment);
+        }catch (Throwable th){
+            setupPreview();
         }
-        cameraView.setTransform(matrix);
     }
-*/
 
+    public void setupPreview(){
+        Log.d("CHECK", "function setupPreview") ;
 
+        camera = Camera.open() ;
+
+        try {
+            camera.setPreviewTexture(surfaceTexture);
+            camera.setDisplayOrientation(90);
+
+            camera.startPreview();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        } catch (RuntimeException re){
+            Log.d("CHECK", "Runtime: " + re.getMessage()) ;
+        }
+
+    }
 
 
 }
