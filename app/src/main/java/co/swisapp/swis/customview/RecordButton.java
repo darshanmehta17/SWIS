@@ -29,7 +29,7 @@ public class RecordButton extends View {
 
     private int ANIMATION_DURATION = 200;
 
-    private int MAX_RADIUS_WHITE_RING = 60;
+    private int MAX_RADIUS_WHITE_RING = 50;
     private int STROKE_WIDTH_WHITE_RING = 4;
 
     private int MAX_RADIUS_RECORD_BUTTON = MAX_RADIUS_WHITE_RING - 3 * STROKE_WIDTH_WHITE_RING;
@@ -113,19 +113,6 @@ public class RecordButton extends View {
         }
 
         drawRecordButton(canvas);
-
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//            canvas.drawRoundRect(getWidth()/2 - maxSize, getHeight()/2 - maxSize, getWidth()/2 + maxSize, getHeight()/2 + maxSize, radius, radius, recordButtonPaint);
-//        }else {
-//            canvas.drawCircle(getWidth() / 2, getHeight() / 2, 130, recordButtonPaint);
-//        }
-
-//        if(radius < maxSize){
-//            canvas.drawPath(drawRoundedRect(getWidth()/2 - maxSize, getHeight()/2 - maxSize, getWidth()/2 + maxSize, getHeight()/2 + maxSize, radius, radius), recordButtonPaint);
-//        }else {
-//            canvas.drawCircle(getWidth() / 2, getHeight() / 2, radius, recordButtonPaint);
-//        }
-
     }
 
     @Override
