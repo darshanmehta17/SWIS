@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
+import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -59,6 +60,30 @@ public class MainVideoFragmentCompat extends Fragment
     }
 
     @Override
+    public void onPause() {
+
+        mediaRecorder.stop();
+        mediaRecorder.release();
+        mediaRecorder.reset();
+
+        camera.release();
+
+        super.onPause();
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (textureView.isAvailable()) {
+            setupPreview();
+        } else {
+            textureView.setSurfaceTextureListener(this);
+        }
+    }
+
+
+    @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
         surfaceTexture = surface ;
 
@@ -73,9 +98,7 @@ public class MainVideoFragmentCompat extends Fragment
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        camera.stopPreview();
-        camera.release();
-        return true;
+        return false ;
     }
 
     @Override
@@ -91,29 +114,27 @@ public class MainVideoFragmentCompat extends Fragment
         MainfilePath = FileHelper.createVideoFile(getActivity(), MainfileName, FileHelper.TYPE_INTERNAL);
 
         mediaRecorder = new MediaRecorder() ;
+        camera.unlock();
+        mediaRecorder.setCamera(camera);
+
+        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
+        mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+
+        CamcorderProfile cpHigh = CamcorderProfile
+                .get(CamcorderProfile.QUALITY_HIGH);
+        mediaRecorder.setProfile(cpHigh);
+        mediaRecorder.setOutputFile(MainfilePath.getAbsolutePath());
+
+            /*mediaRecorder.setVideoEncodingBitRate(10000000);
+            mediaRecorder.setVideoFrameRate(15);*/
         try {
-            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
-            mediaRecorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
-
-            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-
-            mediaRecorder.setOutputFile(MainfilePath.getAbsolutePath());
-            mediaRecorder.setVideoEncodingBitRate(10000000);
-            mediaRecorder.setVideoFrameRate(15);
-
-            camera.unlock();
-            mediaRecorder.setCamera(camera);
-
-            mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
-            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-
-
             mediaRecorder.prepare();
         } catch (IOException e) {
             Log.d("CHECK", "Error message" + e.getMessage()) ;
         } catch (IllegalStateException ise){
             Log.d("CHECK", "Error message:" + ise.getMessage()) ;
         }
+
         mediaRecorder.start();
 
 
@@ -121,8 +142,11 @@ public class MainVideoFragmentCompat extends Fragment
 
     @Override
     public void onStopRecord() {
+
         mediaRecorder.stop();
         mediaRecorder.reset();
+        mediaRecorder.release();
+
         Activity activity = getActivity();
         if (null != activity) {
             Toast.makeText(activity, "Video saved: " + MainfileName,
@@ -130,10 +154,16 @@ public class MainVideoFragmentCompat extends Fragment
             Log.d("FILE NAME", " " + MainfileName) ;
         }
         try{
+            camera.stopPreview();
+            camera.release();
+
             Intent previewFragment = new Intent(getActivity(), MainVideoPlayUploadActivity.class);
             previewFragment.putExtra("filePath", MainfilePath);
             startActivity(previewFragment);
+
+
         }catch (Throwable th){
+            Log.e("ERROR", "INSIDE CATCH BLOCK!!!!") ;
             setupPreview();
         }
     }
