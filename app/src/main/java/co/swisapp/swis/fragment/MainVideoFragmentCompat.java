@@ -60,6 +60,29 @@ public class MainVideoFragmentCompat extends Fragment
     }
 
     @Override
+    public void onPause() {
+
+        mediaRecorder.stop();
+        mediaRecorder.release();
+        mediaRecorder.reset();
+
+        camera.release();
+
+        super.onPause();
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (textureView.isAvailable()) {
+            setupPreview();
+        } else {
+            textureView.setSurfaceTextureListener(this);
+        }
+    }
+
+    @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
         surfaceTexture = surface ;
 
@@ -74,9 +97,7 @@ public class MainVideoFragmentCompat extends Fragment
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        camera.stopPreview();
-        camera.release();
-        return true;
+        return false ;
     }
 
     @Override
@@ -138,7 +159,10 @@ public class MainVideoFragmentCompat extends Fragment
             Intent previewFragment = new Intent(getActivity(), MainVideoPlayUploadActivity.class);
             previewFragment.putExtra("filePath", MainfilePath);
             startActivity(previewFragment);
+
+
         }catch (Throwable th){
+            Log.e("ERROR", "INSIDE CATCH BLOCK!!!!") ;
             setupPreview();
         }
     }
