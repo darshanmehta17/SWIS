@@ -15,7 +15,17 @@
     <string name="password_short">Password must be atleast 6 characters.</string>
     <string name="facebook_app_id">195470017468935</string>
     <string name="password_contains_username">Password must not contain Username in it.</string>
+    <string name="camera_error">Not supported.</string>
+    <string name="permission_request">This app needs permission for camera and microphone to do basic functionality</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_video_capture">VideoCapture</string>
+    <string name="button_record_desc">Begin Recording</string>
+    <string name="stop">Stop</string>
+    <string name="record">Record</string>
+    <string name="app_Id"></string>
+    <string name="uploading">Uploading</string>
+    <string name="upload_success">Upload completed successfully</string>
+    <string name="upload_error">Error while uploading</string>
+
 </resources>
