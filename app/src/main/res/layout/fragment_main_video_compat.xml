@@ -10,13 +10,13 @@
         android:layout_height="match_parent"
         android:id="@+id/textureview_compat"/>
 
-        <co.swisapp.swis.customview.RecordButton
-            android:id="@+id/video_record_button_compat"
-            android:layout_width="@dimen/main_video_recording_button"
-            android:layout_height="100dp"
-            android:layout_margin="20dp"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_gravity="center" />
+    <co.swisapp.swis.customview.RecordButton
+        android:id="@+id/video_record_button_compat"
+        android:layout_width="@dimen/main_video_recording_button"
+        android:layout_height="@dimen/main_video_recording_button"
+        android:layout_margin="@dimen/main_video_margin_record_button"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center" />
 
 </RelativeLayout>

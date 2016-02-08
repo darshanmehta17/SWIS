@@ -5,30 +5,19 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-        <!--<co.swisapp.swis.utility.AutoFitTextureView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/texture"
-            android:layout_alignParentBottom="true" />-->
 
-        <TextureView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/texture"/>
+    <TextureView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/texture"/>
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:paddingBottom="15dp"
-            android:paddingTop="15dp">
-
-            <co.swisapp.swis.customview.RecordButton
-                android:id="@+id/video_record_button"
-                android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:layout_gravity="center" />
-        </FrameLayout>
-
+    <co.swisapp.swis.customview.RecordButton
+        android:id="@+id/video_record_button"
+        android:layout_width="@dimen/main_video_recording_button"
+        android:layout_height="@dimen/main_video_recording_button"
+        android:layout_margin="@dimen/main_video_margin_record_button"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center" />
 
 </RelativeLayout>

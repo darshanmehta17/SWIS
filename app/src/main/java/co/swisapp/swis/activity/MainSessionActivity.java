@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -23,34 +24,43 @@ import co.swisapp.swis.utility.Constants;
  * Onpagechange listener of viewpager is implemented so as to switch between fullscreen mode
  * and normal mode i.e. show status bar mode, while scrolling in the viewpager.
  */
-public class MainSessionActivity extends FragmentActivity implements ViewPager.OnPageChangeListener{
+public class MainSessionActivity extends FragmentActivity implements ViewPager.OnPageChangeListener {
 
-    private ViewPager viewPager ;
-    private int mPosition ;
+    private ViewPager viewPager;
 
     /**
      * Main activity which contains the viewpager.
      * Function is used to initialize adapter and setup activity.
+     *
      * @param savedInstanceState
      */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Constants.PACKAGE_NAME = getApplicationContext().getPackageName() ;
+        Constants.PACKAGE_NAME = getApplicationContext().getPackageName();
         setContentView(R.layout.activity_main_session);
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        viewPager = (ViewPager) findViewById(R.id.main_pager) ;
+        viewPager = (ViewPager) findViewById(R.id.main_pager);
+
+        viewPager.addOnPageChangeListener(this);
 
         FragmentPagerAdapter adapter = new FragmentPagerAdapter(getFragmentManager()) {
             @Override
             public android.app.Fragment getItem(int position) {
-                switch (position){
-                    case 0: return new MainDiscoverFragment() ;
-                    case 1: /*return new MainVideoFragmentCompat();*/
-                        if (Constants.API_LEVEL >= 21) { return new MainVideoFragment(); }
-                        else { return new MainVideoFragmentCompat(); }
-                    case 2: return new MainUserFragment() ;
-                    default: return null ;
+                switch (position) {
+                    case 0:
+                        return new MainDiscoverFragment();
+                    case 1:
+                        if (Constants.API_LEVEL >= 21) {
+                            return new MainVideoFragment();
+                        } else {
+                            return new MainVideoFragmentCompat();
+                        }
+                    case 2:
+                        return new MainUserFragment();
+                    default:
+                        return null;
                 }
 
             }
@@ -83,32 +93,25 @@ public class MainSessionActivity extends FragmentActivity implements ViewPager.O
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
     }
 
     @Override
     public void onPageSelected(int position) {
-        WindowManager.LayoutParams params = getWindow().getAttributes();
 
-
-        if(position == 1) {
+        if (position == 1) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-            params.flags |= WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
         } else {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
         }
 
 
     }
 
-    /**
-     * Starts immersive mode as soon as the scroll state of the viewpager is idle, the statusbar is displayed
-     * when other fragments are opened.
-     * @param state
-     */
     @Override
     public void onPageScrollStateChanged(int state) {
+
     }
 }
