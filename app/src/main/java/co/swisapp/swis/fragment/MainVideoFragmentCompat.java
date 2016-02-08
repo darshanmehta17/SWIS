@@ -33,7 +33,6 @@ public class MainVideoFragmentCompat extends Fragment
     private RecordButton recordButton ;
     private Camera camera ;
     private MediaRecorder mediaRecorder ;
-    /*private Thread thread1 ;*/
     private String MainfileName ;
     private File MainfilePath ;
     private SurfaceTexture surfaceTexture ;
@@ -48,28 +47,24 @@ public class MainVideoFragmentCompat extends Fragment
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        Log.d("MAINVIDEO", "INSIDE COMPAT ACTIVITY") ;
         textureView = (TextureView) view.findViewById(R.id.textureview_compat) ;
         recordButton = (RecordButton) view.findViewById(R.id.video_record_button_compat) ;
 
         recordButton.setOnStartRecordListener(this);
         recordButton.setOnStopRecordListener(this);
-
         textureView.setSurfaceTextureListener(this);
-
-
     }
 
     @Override
     public void onPause() {
-
-        mediaRecorder.stop();
-        mediaRecorder.release();
-        mediaRecorder.reset();
-
+        if(null != mediaRecorder){
+            mediaRecorder.stop();
+            mediaRecorder.release();
+        }
+        camera.stopPreview();
         camera.release();
-
         super.onPause();
-
     }
 
     @Override
@@ -82,30 +77,25 @@ public class MainVideoFragmentCompat extends Fragment
         }
     }
 
-
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
         surfaceTexture = surface ;
-
         setupPreview();
-
     }
-
     @Override
-    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-
-    }
-
+    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {    }
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
         return false ;
     }
-
     @Override
-    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+    public void onSurfaceTextureUpdated(SurfaceTexture surface) {    }
 
-    }
-
+    /**
+     * This method is basically handles the onClick event of the button. Sets up mediaRecording,
+     * audio/video source, filename, prepares the media recorder and starts recording.
+     * The camera is unlocked to ensure fast and lag-less switching to recording mode.
+      */
     @Override
     public void onStartRecord() {
         Log.d("CHECK", "function onStartRecording") ;
@@ -134,12 +124,14 @@ public class MainVideoFragmentCompat extends Fragment
         } catch (IllegalStateException ise){
             Log.d("CHECK", "Error message:" + ise.getMessage()) ;
         }
-
         mediaRecorder.start();
-
-
     }
 
+    /**
+     * Method stops mediaRecorder and prepares it for new recording, and makes an intent to
+     * {@link MainVideoPlayUploadActivity} class to display what has been recorder and to call
+     * the upload service.
+     */
     @Override
     public void onStopRecord() {
 
@@ -149,8 +141,7 @@ public class MainVideoFragmentCompat extends Fragment
 
         Activity activity = getActivity();
         if (null != activity) {
-            Toast.makeText(activity, "Video saved: " + MainfileName,
-                    Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, "Video saved: " + MainfileName, Toast.LENGTH_SHORT).show();
             Log.d("FILE NAME", " " + MainfileName) ;
         }
         try{
@@ -160,8 +151,6 @@ public class MainVideoFragmentCompat extends Fragment
             Intent previewFragment = new Intent(getActivity(), MainVideoPlayUploadActivity.class);
             previewFragment.putExtra("filePath", MainfilePath);
             startActivity(previewFragment);
-
-
         }catch (Throwable th){
             Log.e("ERROR", "INSIDE CATCH BLOCK!!!!") ;
             setupPreview();
@@ -172,10 +161,10 @@ public class MainVideoFragmentCompat extends Fragment
         Log.d("CHECK", "function setupPreview") ;
 
         camera = Camera.open() ;
-
         try {
             camera.setPreviewTexture(surfaceTexture);
             camera.setDisplayOrientation(90);
+            //TODO:
 
             camera.startPreview();
         } catch (IOException ioe) {
@@ -185,6 +174,4 @@ public class MainVideoFragmentCompat extends Fragment
         }
 
     }
-
-
 }
