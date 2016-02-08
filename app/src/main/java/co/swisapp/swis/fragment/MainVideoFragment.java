@@ -174,7 +174,6 @@ public class MainVideoFragment extends android.app.Fragment implements RecordBut
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
-        Log.d("MAINVIDEO", "INSIDE RECORDING ACTIVITY") ;
         textureView = (TextureView) view.findViewById(R.id.texture);
         mButtonVideo = (RecordButton) view.findViewById(R.id.video_record_button);
 
@@ -296,7 +295,6 @@ public class MainVideoFragment extends android.app.Fragment implements RecordBut
         }
         CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
         try {
-            Log.d(TAG, "tryAcquire");
             if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
                 throw new RuntimeException("Time out waiting to lock camera opening.");
             }
@@ -397,9 +395,11 @@ public class MainVideoFragment extends android.app.Fragment implements RecordBut
      * Update the camera preview. {@link #startPreview()} needs to be called in advance.
      */
     private void updatePreview() {
+
         if (null == mCameraDevice) {
             return;
         }
+
         try {
             setUpCaptureRequestBuilder(mPreviewBuilder);
             HandlerThread thread = new HandlerThread("CameraPreview");
