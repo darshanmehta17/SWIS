@@ -415,7 +415,7 @@ public class MainVideoFragment extends android.app.Fragment implements RecordBut
     }
 
     /**
-     *Method is responsible to acurately render the camera input on the textureView surface, this
+     *Method is responsible to accurately render the camera input on the textureView surface, this
      * includes proper dimensional rendering, maintaining aspect ratio and also the orientation.
      * @param viewWidth - obtained width
      * @param viewHeight - obtained height
@@ -490,6 +490,7 @@ public class MainVideoFragment extends android.app.Fragment implements RecordBut
      */
     @Override
     public void onStopRecord() {
+
         mMediaRecorder.stop();
         mMediaRecorder.reset();
         Activity activity = getActivity();

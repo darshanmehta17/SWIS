@@ -92,7 +92,7 @@ public class MainVideoFragmentCompat extends Fragment
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {    }
 
     /**
-     * This method is basically handles the onClick event of the button. Sets up mediaRecording,
+     * This method handles the onClick event of the button. Sets up mediaRecording,
      * audio/video source, filename, prepares the media recorder and starts recording.
      * The camera is unlocked to ensure fast and lag-less switching to recording mode.
       */

@@ -40,14 +40,17 @@ public class MainSessionActivity extends FragmentActivity implements ViewPager.O
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         viewPager = (ViewPager) findViewById(R.id.main_pager) ;
 
+        WindowManager.LayoutParams params = getWindow().getAttributes();
+        params.flags |= WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
+
         FragmentPagerAdapter adapter = new FragmentPagerAdapter(getFragmentManager()) {
             @Override
             public android.app.Fragment getItem(int position) {
                 switch (position){
                     case 0: return new MainDiscoverFragment() ;
-                    case 1: return new MainVideoFragmentCompat();
-                        /*if (Constants.API_LEVEL >= 21) { return new MainVideoFragment(); }
-                        else { return new MainVideoFragmentCompat(); }*/
+                    case 1: /*return new MainVideoFragmentCompat();*/
+                        if (Constants.API_LEVEL >= 21) { return new MainVideoFragment(); }
+                        else { return new MainVideoFragmentCompat(); }
                     case 2: return new MainUserFragment() ;
                     default: return null ;
                 }
@@ -99,8 +102,7 @@ public class MainSessionActivity extends FragmentActivity implements ViewPager.O
             case ViewPager.SCROLL_STATE_IDLE:
                 if(mPosition == 1) {
                     getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                    WindowManager.LayoutParams params = getWindow().getAttributes();
-                    params.flags |= WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
+
                     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
                 } else {
                     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
