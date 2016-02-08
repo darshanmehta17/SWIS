@@ -11,7 +11,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
@@ -32,7 +31,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v13.app.FragmentCompat;
 import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.Surface;
@@ -172,14 +170,14 @@ public class MainVideoFragment extends android.app.Fragment implements RecordBut
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
 
-        Initialize(view);
+        initialize(view);
 
         mButtonVideo.setOnStartRecordListener(this);
         mButtonVideo.setOnStopRecordListener(this);
     }
 
-    private void Initialize(View view){
-        textureView = (TextureView) view.findViewById(R.id.texture);
+    private void initialize(View view){
+        textureView = (TextureView) view.findViewById(R.id.main_video_texture);
         mButtonVideo = (RecordButton) view.findViewById(R.id.video_record_button);
     }
 

@@ -37,29 +37,32 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
     private TextureView mPreview;
     private ImageButton saveFileButton;
     private ImageButton uploadFile;
-    private static final String USER_AGENT = "MainVideoPlayUploadActivity/" + BuildConfig.VERSION_NAME;
-    private File FilePathIntent;
+    private static final String USER_AGENT = "device-android/" + BuildConfig.VERSION_NAME;
+    private File filePathIntent;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_main_video_play_upload);
-        Initialize();
+        initialize();
 
         mPreview.setSurfaceTextureListener(this);
         uploadFile.setOnClickListener(this);
         saveFileButton.setOnClickListener(this);
 
         Intent i = getIntent();
-        FilePathIntent = (File) i.getExtras().get("filePath");
+        filePathIntent = (File) i.getExtras().get("filePath");
     }
 
-    private void Initialize() {
+    private void initialize() {
+        /**
+         * Sets the namespace used to broadcast events. As given in the library documentation.
+         */
         UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
 
-        mPreview = (TextureView) findViewById(R.id.play_texture);
-        saveFileButton = (ImageButton) findViewById(R.id.save_button);
-        uploadFile = (ImageButton) findViewById(R.id.upload);
+        mPreview = (TextureView) findViewById(R.id.playupload_tv_texture);
+        saveFileButton = (ImageButton) findViewById(R.id.playupload_ibtn_save);
+        uploadFile = (ImageButton) findViewById(R.id.playupload_ibtn_upload);
     }
 
     @Override
@@ -68,7 +71,7 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
     }
 
     /**
-     * Setting up mediaplayer on the current surface to play the recorded video.
+     * Setting up mediaPlayer on the current surface to play the recorded video.
      *
      * @param surface SurfaceTexture on which rendering will take place
      * @param width   obtained width
@@ -80,7 +83,7 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
 
         try {
             mMediaPlayer = new MediaPlayer();
-            mMediaPlayer.setDataSource(FilePathIntent.getAbsolutePath());
+            mMediaPlayer.setDataSource(filePathIntent.getAbsolutePath());
 
             mMediaPlayer.setSurface(s);
             mMediaPlayer.prepare();
@@ -124,13 +127,20 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.upload:
-                MultiPartUpload();
+            case R.id.playupload_ibtn_upload:
+                multiPartUpload();
                 break;
-            case R.id.save_button:
-                SaveExternal();
+            case R.id.playupload_ibtn_save:
+                Thread thread = new Thread() {
+                    @Override
+                    public void run() {
+                        saveExternal();
+
+                    }
+                };
+                thread.start();
                 break;
-            case R.id.setLocation:
+            case R.id.playupload_ibtn_location:
                 break;
         }
     }
@@ -139,11 +149,11 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
      * Method handling the upload to server functionality, as part of the library - 'gotev'
      * Upload service.
      */
-    void MultiPartUpload() {
+    void multiPartUpload() {
         final String serverUrlString = " ";
         final String paramNameString = " ";
 
-        final String filesToUploadString = FilePathIntent.getAbsolutePath();
+        final String filesToUploadString = filePathIntent.getAbsolutePath();
         try {
             final String filename = getFilename(filesToUploadString);
 
@@ -183,8 +193,8 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
                 .setRingToneEnabled(true);
     }
 
-    private void SaveExternal() {
-        File source = FilePathIntent;
+    private void saveExternal() {
+        File source = filePathIntent;
         File destination = FileHelper.createVideoFile(getApplicationContext(), FileHelper.generateVideoFileName(), FileHelper.TYPE_EXTERNAL);
 
         try {
@@ -201,7 +211,7 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
      * @param dst New file in storage directory
      * @throws IOException
      */
-    private void copyVideo(File src, File dst) throws IOException {
+    private void copyVideo(File src, File dst)  throws IOException {
 
         FileInputStream in = new FileInputStream(src);
         FileOutputStream out = new FileOutputStream(dst);

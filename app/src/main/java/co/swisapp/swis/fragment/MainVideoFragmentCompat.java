@@ -46,7 +46,7 @@ public class MainVideoFragmentCompat extends Fragment
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        textureView = (TextureView) view.findViewById(R.id.texture);
+        textureView = (TextureView) view.findViewById(R.id.main_video_texture);
         recordButton = (RecordButton) view.findViewById(R.id.video_record_button);
 
         recordButton.setOnStartRecordListener(this);
@@ -78,6 +78,7 @@ public class MainVideoFragmentCompat extends Fragment
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
         surfaceTexture = surface;
+        
         setupPreview();
     }
 

@@ -16,8 +16,7 @@ import co.swisapp.swis.fragment.MainVideoFragmentCompat;
 import co.swisapp.swis.utility.Constants;
 
 /**
- * OnPageChange listener of viewpager is implemented so as to switch between fullscreen mode
- * and normal mode i.e. show status bar mode, while scrolling in the viewpager.
+ * OnPageChange listener to assign specific action for each fragment of viewpage
  */
 public class MainSessionActivity extends FragmentActivity implements ViewPager.OnPageChangeListener {
 
@@ -34,7 +33,7 @@ public class MainSessionActivity extends FragmentActivity implements ViewPager.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_session);
 
-        Initialize();
+        initialize();
 
         viewPager.addOnPageChangeListener(this);
 
@@ -66,7 +65,7 @@ public class MainSessionActivity extends FragmentActivity implements ViewPager.O
 
     }
 
-    private void Initialize(){
+    private void initialize(){
 
         Constants.PACKAGE_NAME = getApplicationContext().getPackageName();
 
