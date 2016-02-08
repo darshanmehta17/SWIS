@@ -5,4 +5,5 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="main_video_recording_button">100dp</dimen>
     <dimen name="main_video_margin_record_button">10dp</dimen>
+    <dimen name="signup_facebook_fragment">125dp</dimen>
 </resources>

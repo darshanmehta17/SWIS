@@ -59,7 +59,6 @@ import co.swisapp.swis.utility.FileHelper;
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class MainVideoFragment extends android.app.Fragment implements RecordButton.OnStartRecordListener, RecordButton.OnStopRecordListener, FragmentCompat.OnRequestPermissionsResultCallback {
 
-    private static final String TAG = "MainVideoFragment";
     private static final int REQUEST_VIDEO_PERMISSIONS = 1;
     private static final String FRAGMENT_DIALOG = "dialog";
 
@@ -144,7 +143,6 @@ public class MainVideoFragment extends android.app.Fragment implements RecordBut
                 return size;
             }
         }
-        Log.e(TAG, "Couldn't find any suitable video size");
         return choices[choices.length - 1];
     }
 
@@ -162,7 +160,6 @@ public class MainVideoFragment extends android.app.Fragment implements RecordBut
         if (bigEnough.size() > 0) {
             return Collections.min(bigEnough, new CompareSizesByArea());
         } else {
-            Log.e(TAG, "Couldn't find any suitable preview size");
             return choices[0];
         }
     }
@@ -174,11 +171,16 @@ public class MainVideoFragment extends android.app.Fragment implements RecordBut
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
-        textureView = (TextureView) view.findViewById(R.id.texture);
-        mButtonVideo = (RecordButton) view.findViewById(R.id.video_record_button);
+
+        Initialize(view);
 
         mButtonVideo.setOnStartRecordListener(this);
         mButtonVideo.setOnStopRecordListener(this);
+    }
+
+    private void Initialize(View view){
+        textureView = (TextureView) view.findViewById(R.id.texture);
+        mButtonVideo = (RecordButton) view.findViewById(R.id.video_record_button);
     }
 
     @Override
@@ -245,7 +247,6 @@ public class MainVideoFragment extends android.app.Fragment implements RecordBut
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
-        Log.d(TAG, "onRequestPermissionsResult");
         if (requestCode == REQUEST_VIDEO_PERMISSIONS) {
             if (grantResults.length == VIDEO_PERMISSIONS.length) {
                 for (int result : grantResults) {
@@ -373,6 +374,7 @@ public class MainVideoFragment extends android.app.Fragment implements RecordBut
     }
 
 
+
     private void closeCamera() {
         try {
             mCameraOpenCloseLock.acquire();
@@ -497,7 +499,6 @@ public class MainVideoFragment extends android.app.Fragment implements RecordBut
         if (null != activity) {
             Toast.makeText(activity, "Video saved: " + mainFileName,
                     Toast.LENGTH_SHORT).show();
-            Log.d("FILE NAME", " " + mainFileName) ;
         }
         try{
             Intent previewFragment = new Intent(getActivity(), MainVideoPlayUploadActivity.class);

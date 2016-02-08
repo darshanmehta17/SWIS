@@ -1,8 +1,6 @@
 package co.swisapp.swis.activity;
 
 
-import android.app.Fragment;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.SurfaceTexture;
 import android.media.AudioManager;
@@ -11,17 +9,14 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageButton;
 
 import net.gotev.uploadservice.MultipartUploadRequest;
 import net.gotev.uploadservice.UploadNotificationConfig;
 import net.gotev.uploadservice.UploadService;
-import net.gotev.uploadservice.UploadServiceBroadcastReceiver;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,38 +28,38 @@ import java.nio.channels.FileChannel;
 
 import co.swisapp.swis.BuildConfig;
 import co.swisapp.swis.R;
-import co.swisapp.swis.utility.CameraHelper;
 import co.swisapp.swis.utility.FileHelper;
 
 public class MainVideoPlayUploadActivity extends AppCompatActivity implements
-        TextureView.SurfaceTextureListener, MediaPlayer.OnCompletionListener, View.OnClickListener{
+        TextureView.SurfaceTextureListener, MediaPlayer.OnCompletionListener, View.OnClickListener {
 
     private MediaPlayer mMediaPlayer;
     private TextureView mPreview;
-    private ImageButton saveFileButton ;
-    private ImageButton uploadFile ;
-    private static final String TAG = "MainVideoPlayUploadActivity";
+    private ImageButton saveFileButton;
+    private ImageButton uploadFile;
     private static final String USER_AGENT = "MainVideoPlayUploadActivity/" + BuildConfig.VERSION_NAME;
-    private File FilePathIntent ;
+    private File FilePathIntent;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
-
         setContentView(R.layout.fragment_main_video_play_upload);
-        mPreview = (TextureView)findViewById(R.id.play_texture);
+        Initialize();
+
         mPreview.setSurfaceTextureListener(this);
-
-        saveFileButton = (ImageButton)findViewById(R.id.save_button) ;
-        uploadFile = (ImageButton)findViewById(R.id.upload) ;
-
         uploadFile.setOnClickListener(this);
         saveFileButton.setOnClickListener(this);
 
-        Intent i = getIntent() ;
-        FilePathIntent = (File)i.getExtras().get("filePath");
+        Intent i = getIntent();
+        FilePathIntent = (File) i.getExtras().get("filePath");
+    }
+
+    private void Initialize() {
+        UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
+
+        mPreview = (TextureView) findViewById(R.id.play_texture);
+        saveFileButton = (ImageButton) findViewById(R.id.save_button);
+        uploadFile = (ImageButton) findViewById(R.id.upload);
     }
 
     @Override
@@ -74,16 +69,17 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
 
     /**
      * Setting up mediaplayer on the current surface to play the recorded video.
-      * @param surface SurfaceTexture on which rendering will take place
-     * @param width obtained width
-     * @param height obtained height
+     *
+     * @param surface SurfaceTexture on which rendering will take place
+     * @param width   obtained width
+     * @param height  obtained height
      */
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
         Surface s = new Surface(surface);
 
         try {
-            mMediaPlayer= new MediaPlayer();
+            mMediaPlayer = new MediaPlayer();
             mMediaPlayer.setDataSource(FilePathIntent.getAbsolutePath());
 
             mMediaPlayer.setSurface(s);
@@ -97,29 +93,45 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
 
             mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mMediaPlayer.start();
-        } catch (IllegalArgumentException e) { e.printStackTrace();
-        } catch (SecurityException e) { e.printStackTrace();
-        } catch (IllegalStateException e) { e.printStackTrace();
-        } catch (IOException e) { e.printStackTrace(); }
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
     @Override
-    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {}
+    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+    }
+
     @Override
-    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) { return false; }
+    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+        return false;
+    }
+
     @Override
-    public void onSurfaceTextureUpdated(SurfaceTexture surface) { }
+    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+    }
+
     @Override
-    public void onCompletion(MediaPlayer mp) { }
+    public void onCompletion(MediaPlayer mp) {
+    }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.upload: MultiPartUpload();
-                                break;
-            case R.id.save_button: SaveExternal();
-                                break;
+        switch (v.getId()) {
+            case R.id.upload:
+                MultiPartUpload();
+                break;
+            case R.id.save_button:
+                SaveExternal();
+                break;
             case R.id.setLocation:
-                                break;
+                break;
         }
     }
 
@@ -127,11 +139,11 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
      * Method handling the upload to server functionality, as part of the library - 'gotev'
      * Upload service.
      */
-    void MultiPartUpload(){
-        final String serverUrlString = " " ;
+    void MultiPartUpload() {
+        final String serverUrlString = " ";
         final String paramNameString = " ";
 
-        final String filesToUploadString = FilePathIntent.getAbsolutePath() ;
+        final String filesToUploadString = FilePathIntent.getAbsolutePath();
         try {
             final String filename = getFilename(filesToUploadString);
 
@@ -146,16 +158,17 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
         } catch (FileNotFoundException exc) {
             exc.printStackTrace();
         } catch (IllegalArgumentException exc) {
-            Log.d("ERR", exc.getMessage() + " ") ;
+            Log.d("ERR", exc.getMessage() + " ");
         } catch (MalformedURLException exc) {
-            Log.d("ERR", exc.getMessage() ) ;
+            Log.d("ERR", exc.getMessage());
         }
     }
 
     /**
      * Setting the persistent notification when the upload takes place.
+     *
      * @param filename header name
-     * @return
+     * @return Config
      */
     private UploadNotificationConfig getNotificationConfig(String filename) {
         return new UploadNotificationConfig()
@@ -169,8 +182,9 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
                 .setClearOnAction(true)
                 .setRingToneEnabled(true);
     }
-    private void SaveExternal(){
-        File source = FilePathIntent ;
+
+    private void SaveExternal() {
+        File source = FilePathIntent;
         File destination = FileHelper.createVideoFile(getApplicationContext(), FileHelper.generateVideoFileName(), FileHelper.TYPE_EXTERNAL);
 
         try {
@@ -182,18 +196,19 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
 
     /**
      * Copies file from the exisiting internal directory and saves it to the external app directory
+     *
      * @param src Original file in root directory
      * @param dst New file in storage directory
      * @throws IOException
      */
-    private void copyVideo(File src, File dst) throws IOException{
+    private void copyVideo(File src, File dst) throws IOException {
 
-        FileInputStream in = new FileInputStream(src) ;
-        FileOutputStream out = new FileOutputStream(dst) ;
+        FileInputStream in = new FileInputStream(src);
+        FileOutputStream out = new FileOutputStream(dst);
 
-        FileChannel inChannel = in.getChannel() ;
-        FileChannel outChannel = out.getChannel() ;
-        inChannel.transferTo(0, inChannel.size(), outChannel) ;
+        FileChannel inChannel = in.getChannel();
+        FileChannel outChannel = out.getChannel();
+        inChannel.transferTo(0, inChannel.size(), outChannel);
         in.close();
         out.close();
         out.close();

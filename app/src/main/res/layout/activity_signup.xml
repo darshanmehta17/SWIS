@@ -58,9 +58,9 @@
         android:layout_centerHorizontal="true" />
 
     <EditText
+        android:id="@+id/username"
         android:layout_width="wrap_content"
         android:hint="@string/signup_username"
-        android:id="@+id/username"
         android:layout_gravity="center_horizontal"
         android:layout_height="wrap_content"
         android:layout_below="@+id/input_layout_name"
@@ -68,21 +68,21 @@
         android:layout_alignStart="@+id/register" />
 
     <fragment
+        android:id="@+id/fragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:name="co.swisapp.swis.apis.facebook_api"
-        android:id="@+id/fragment"
-        android:layout_marginTop="125dp"
+        android:layout_marginTop="@dimen/signup_facebook_fragment"
         tools:layout="@layout/fragment_facebook_api"
         android:layout_below="@+id/register"
         android:layout_centerHorizontal="true" />
 
  <TextView
+     android:id="@+id/textView"
      android:layout_width="wrap_content"
      android:layout_height="wrap_content"
      android:textAppearance="?android:attr/textAppearanceMedium"
      android:text="OR"
-     android:id="@+id/textView"
      android:layout_below="@+id/register"
      android:layout_centerHorizontal="true"
      android:layout_marginTop="45dp" />

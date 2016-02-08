@@ -3,19 +3,21 @@
     android:layout_width="match_parent" android:layout_height="match_parent">
 
     <TextureView
+        android:id="@+id/play_texture"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/play_texture"/>
+        />
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <ImageButton
+            android:id="@+id/setLocation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@android:drawable/ic_menu_mylocation"
-            android:id="@+id/setLocation"/>
+            />
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -34,17 +36,18 @@
 
 
         <ImageButton
+            android:id="@+id/save_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@android:drawable/ic_menu_save"
-            android:id="@+id/save_button"/>
+            android:src="@android:drawable/ic_menu_save"/>
 
         <ImageButton
+            android:id="@+id/upload"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@android:drawable/ic_menu_upload_you_tube"
             android:layout_gravity="center"
-            android:id="@+id/upload"/>
+            />
 
         <ImageButton
             android:layout_width="wrap_content"
