@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.view.Window;
 import android.view.WindowManager;
 
 import co.swisapp.swis.R;
@@ -40,9 +41,6 @@ public class MainSessionActivity extends FragmentActivity implements ViewPager.O
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         viewPager = (ViewPager) findViewById(R.id.main_pager) ;
 
-        WindowManager.LayoutParams params = getWindow().getAttributes();
-        params.flags |= WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
-
         FragmentPagerAdapter adapter = new FragmentPagerAdapter(getFragmentManager()) {
             @Override
             public android.app.Fragment getItem(int position) {
@@ -64,6 +62,7 @@ public class MainSessionActivity extends FragmentActivity implements ViewPager.O
         };
 
         viewPager.setAdapter(adapter);
+
     }
 
     /**
@@ -88,7 +87,20 @@ public class MainSessionActivity extends FragmentActivity implements ViewPager.O
 
     @Override
     public void onPageSelected(int position) {
-        mPosition = position;
+        WindowManager.LayoutParams params = getWindow().getAttributes();
+
+
+        if(position == 1) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+            params.flags |= WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
+        } else {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
+        }
+
+
     }
 
     /**
@@ -98,16 +110,5 @@ public class MainSessionActivity extends FragmentActivity implements ViewPager.O
      */
     @Override
     public void onPageScrollStateChanged(int state) {
-        switch(state) {
-            case ViewPager.SCROLL_STATE_IDLE:
-                if(mPosition == 1) {
-                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-                } else {
-                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-                }
-        }
     }
 }
