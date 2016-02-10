@@ -55,7 +55,9 @@ import co.swisapp.swis.utility.CameraHelper;
 import co.swisapp.swis.utility.FileHelper;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-public class MainVideoFragment extends android.app.Fragment implements RecordButton.OnStartRecordListener, RecordButton.OnStopRecordListener, FragmentCompat.OnRequestPermissionsResultCallback {
+public class MainVideoFragment extends android.app.Fragment implements
+        RecordButton.OnStartRecordListener, RecordButton.OnStopRecordListener,
+        FragmentCompat.OnRequestPermissionsResultCallback{
 
     private static final int REQUEST_VIDEO_PERMISSIONS = 1;
     private static final String FRAGMENT_DIALOG = "dialog";
@@ -67,7 +69,7 @@ public class MainVideoFragment extends android.app.Fragment implements RecordBut
     private Size mPreviewSize;
     private Size mVideoSize;
     private CaptureRequest.Builder mPreviewBuilder;
-    private MediaRecorder mMediaRecorder;
+    private static MediaRecorder mMediaRecorder;
     private HandlerThread mBackgroundThread;
     private Handler mBackgroundHandler;
     public String mainFileName;
@@ -471,12 +473,19 @@ public class MainVideoFragment extends android.app.Fragment implements RecordBut
         int orientation = CameraHelper.ORIENTATIONS.get(rotation);
         mMediaRecorder.setOrientationHint(orientation);
         mMediaRecorder.prepare();
-
     }
+
+    public static void FragmentChangeHandler(){
+        /**
+         * TODO: Call onStopRecord function. To do that, create a static context.
+         */
+    }
+
 
     @Override
     public void onStartRecord() {
         try {
+            CameraHelper.isRecordingSetter(true);
             mMediaRecorder.start();
         } catch (IllegalStateException e) {
             e.printStackTrace();
@@ -491,6 +500,7 @@ public class MainVideoFragment extends android.app.Fragment implements RecordBut
     @Override
     public void onStopRecord() {
 
+        CameraHelper.isRecordingSetter(false);
         mMediaRecorder.stop();
         mMediaRecorder.reset();
         Activity activity = getActivity();

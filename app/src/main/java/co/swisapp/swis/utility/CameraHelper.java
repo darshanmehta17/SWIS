@@ -4,7 +4,10 @@ package co.swisapp.swis.utility;
 import android.util.SparseIntArray;
 import android.view.Surface;
 
-public abstract class CameraHelper {
+public class CameraHelper {
+
+    public static boolean isRecording ;
+
     /**
      * SparseIntArray for referencing orientations with respect to their integer value.
      */
@@ -14,5 +17,13 @@ public abstract class CameraHelper {
         ORIENTATIONS.append(Surface.ROTATION_90, 0);
         ORIENTATIONS.append(Surface.ROTATION_180, 270);
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
+    }
+
+    public static void isRecordingSetter(boolean val){
+        isRecording = val ;
+    }
+
+    public static boolean isRecordingGetter(){
+        return isRecording ;
     }
 }

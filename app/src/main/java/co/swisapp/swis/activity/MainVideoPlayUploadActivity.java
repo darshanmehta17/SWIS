@@ -31,14 +31,15 @@ import co.swisapp.swis.R;
 import co.swisapp.swis.utility.FileHelper;
 
 public class MainVideoPlayUploadActivity extends AppCompatActivity implements
-        TextureView.SurfaceTextureListener, MediaPlayer.OnCompletionListener, View.OnClickListener {
+        TextureView.SurfaceTextureListener, MediaPlayer.OnCompletionListener, View.OnClickListener{
 
     private MediaPlayer mMediaPlayer;
     private TextureView mPreview;
     private ImageButton saveFileButton;
     private ImageButton uploadFile;
-    private static final String USER_AGENT = "device-android/" + BuildConfig.VERSION_NAME;
+    private static final String USER_AGENT = "device-android-" + BuildConfig.VERSION_NAME;
     private File filePathIntent;
+    private boolean isPlaying = true ;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,9 +50,12 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
         mPreview.setSurfaceTextureListener(this);
         uploadFile.setOnClickListener(this);
         saveFileButton.setOnClickListener(this);
+        mPreview.setOnClickListener(this);
 
         Intent i = getIntent();
         filePathIntent = (File) i.getExtras().get("filePath");
+
+
     }
 
     private void initialize() {
@@ -60,13 +64,15 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
          */
         UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
 
-        mPreview = (TextureView) findViewById(R.id.playupload_tv_texture);
-        saveFileButton = (ImageButton) findViewById(R.id.playupload_ibtn_save);
-        uploadFile = (ImageButton) findViewById(R.id.playupload_ibtn_upload);
+        mPreview = (TextureView) findViewById(R.id.play_upload_tv_texture);
+        saveFileButton = (ImageButton) findViewById(R.id.play_upload_ibtn_save);
+        uploadFile = (ImageButton) findViewById(R.id.play_upload_ibtn_upload);
     }
 
     @Override
     protected void onPause() {
+
+        mMediaPlayer.pause();
         super.onPause();
     }
 
@@ -87,7 +93,7 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
 
             mMediaPlayer.setSurface(s);
             mMediaPlayer.prepare();
-
+            mMediaPlayer.setLooping(true);
             /*mMediaPlayer.setOnBufferingUpdateListener(this);
             mMediaPlayer.setOnPreparedListener(this);
             mMediaPlayer.setOnVideoSizeChangedListener(this);*/
@@ -127,10 +133,10 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.playupload_ibtn_upload:
+            case R.id.play_upload_ibtn_upload:
                 multiPartUpload();
                 break;
-            case R.id.playupload_ibtn_save:
+            case R.id.play_upload_ibtn_save:
                 Thread thread = new Thread() {
                     @Override
                     public void run() {
@@ -140,7 +146,17 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
                 };
                 thread.start();
                 break;
-            case R.id.playupload_ibtn_location:
+            case R.id.play_upload_ibtn_location:
+                break;
+            case R.id.play_upload_tv_texture:
+                if(isPlaying){
+                    mMediaPlayer.pause();
+                    isPlaying = false ;
+                }
+                else{
+                    mMediaPlayer.start();
+                    isPlaying = true ;
+                }
                 break;
         }
     }
@@ -150,13 +166,13 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
      * Upload service.
      */
     void multiPartUpload() {
-        final String serverUrlString = " ";
-        final String paramNameString = " ";
-
         final String filesToUploadString = filePathIntent.getAbsolutePath();
-        try {
-            final String filename = getFilename(filesToUploadString);
+        final String filename = getFilename(filesToUploadString);
 
+        final String serverUrlString = "https://swis-vuln-1.c9users.io/api/photo";
+        final String paramNameString = filename;
+
+        try {
             String uploadID = new MultipartUploadRequest(this, serverUrlString)
                     .addFileToUpload(filesToUploadString, paramNameString)
                     .setNotificationConfig(getNotificationConfig(filename))
@@ -230,4 +246,5 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
         final String[] filepathParts = filepath.split("/");
         return filepathParts[filepathParts.length - 1];
     }
+
 }

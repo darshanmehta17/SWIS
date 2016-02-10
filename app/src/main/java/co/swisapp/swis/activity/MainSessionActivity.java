@@ -13,6 +13,7 @@ import co.swisapp.swis.fragment.MainDiscoverFragment;
 import co.swisapp.swis.fragment.MainUserFragment;
 import co.swisapp.swis.fragment.MainVideoFragment;
 import co.swisapp.swis.fragment.MainVideoFragmentCompat;
+import co.swisapp.swis.utility.CameraHelper;
 import co.swisapp.swis.utility.Constants;
 
 /**
@@ -100,6 +101,9 @@ public class MainSessionActivity extends FragmentActivity implements ViewPager.O
         } else {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+        }
+        if(position!=1 && CameraHelper.isRecordingGetter()){
+            MainVideoFragment.FragmentChangeHandler();
         }
     }
 
