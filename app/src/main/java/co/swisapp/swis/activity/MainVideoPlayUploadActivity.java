@@ -1,6 +1,7 @@
 package co.swisapp.swis.activity;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.SurfaceTexture;
 import android.media.AudioManager;
@@ -17,6 +18,7 @@ import android.widget.ImageButton;
 import net.gotev.uploadservice.MultipartUploadRequest;
 import net.gotev.uploadservice.UploadNotificationConfig;
 import net.gotev.uploadservice.UploadService;
+import net.gotev.uploadservice.UploadServiceBroadcastReceiver;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,6 +31,7 @@ import java.nio.channels.FileChannel;
 import co.swisapp.swis.BuildConfig;
 import co.swisapp.swis.R;
 import co.swisapp.swis.utility.FileHelper;
+import co.swisapp.swis.utility.UploadUtils;
 
 public class MainVideoPlayUploadActivity extends AppCompatActivity implements
         TextureView.SurfaceTextureListener, MediaPlayer.OnCompletionListener, View.OnClickListener{
@@ -70,9 +73,16 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
     }
 
     @Override
-    protected void onPause() {
+    protected void onResume() {
+        super.onResume();
+        uploadServiceBroadcastReceiver.register(getApplicationContext());
+        //TODO: Register broadcast in Manifest file
+    }
 
+    @Override
+    protected void onPause() {
         mMediaPlayer.pause();
+        uploadServiceBroadcastReceiver.unregister(getApplicationContext());
         super.onPause();
     }
 
@@ -180,6 +190,7 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
                     .setAutoDeleteFilesAfterSuccessfulUpload(true)
                     .setUsesFixedLengthStreamingMode(true)
                     .setMaxRetries(3)
+                    .addParameter("file", filename)
                     .startUpload();
         } catch (FileNotFoundException exc) {
             exc.printStackTrace();
@@ -247,4 +258,44 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
         return filepathParts[filepathParts.length - 1];
     }
 
+    private final UploadUtils uploadServiceBroadcastReceiver = new
+            UploadUtils(){
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    super.onReceive(context, intent);
+                }
+
+                @Override
+                public void register(Context context) {
+                    super.register(context);
+                }
+
+                @Override
+                public void unregister(Context context) {
+                    super.unregister(context);
+                }
+
+                @Override
+                public void onError(String uploadId, Exception exception) {
+                    super.onError(uploadId, exception);
+
+                    Log.i("TEST", "onError of Upload", exception) ;
+                }
+
+                @Override
+                public void onCompleted(String uploadId, int serverResponseCode, byte[] serverResponseBody) {
+                    super.onCompleted(uploadId, serverResponseCode, serverResponseBody);
+
+                    Log.i("TEST", "Upload with ID " + uploadId
+                            + " has been completed with HTTP " + serverResponseCode
+                            + ". Response from server: "
+                            + new String(serverResponseBody));
+
+                }
+
+                @Override
+                public void onCancelled(String uploadId) {
+                    super.onCancelled(uploadId);
+                }
+            };
 }
