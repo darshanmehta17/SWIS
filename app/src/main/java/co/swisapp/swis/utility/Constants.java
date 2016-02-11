@@ -32,4 +32,7 @@ public abstract class Constants {
 
     public static final String TEXT_UPLOAD_NOTIFICATION_TITLE = "Uploading";
 
+    public static final String INTENT_FILEPATH_PARAM = "filepath" ;
+    public static final String INTENT_ID = "id" ;
+
 }

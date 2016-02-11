@@ -18,7 +18,6 @@ import android.widget.ImageButton;
 import net.gotev.uploadservice.MultipartUploadRequest;
 import net.gotev.uploadservice.UploadNotificationConfig;
 import net.gotev.uploadservice.UploadService;
-import net.gotev.uploadservice.UploadServiceBroadcastReceiver;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,8 +40,10 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
     private TextureView mPreview;
     private ImageButton saveFileButton;
     private ImageButton uploadFile;
-    private File filePathIntent;
+    private String filePathIntent;
+    private Integer intentId ;
     private boolean isPlaying = true ;
+    private static String TAG = "Err_Play_Upload_Log" ;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -55,10 +56,15 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
         saveFileButton.setOnClickListener(this);
         mPreview.setOnClickListener(this);
 
+        handleIntent() ;
+    }
+
+    private void handleIntent(){
         Intent intent = getIntent();
-        filePathIntent = (File) intent.getExtras().get("filePath");
-
-
+        intentId = (int)intent.getExtras().get(Constants.INTENT_ID) ;
+        if(intent.getData() == null && intentId == 1) {
+            filePathIntent = (String) intent.getExtras().get(Constants.INTENT_FILEPATH_PARAM);
+        }
     }
 
     private void initialize() {
@@ -81,7 +87,7 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
 
     @Override
     protected void onPause() {
-        mMediaPlayer.pause();
+        mMediaPlayer.stop();
         uploadServiceBroadcastReceiver.unregister(getApplicationContext());
         super.onPause();
     }
@@ -99,19 +105,22 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
 
         try {
             mMediaPlayer = new MediaPlayer();
-            mMediaPlayer.setDataSource(filePathIntent.getAbsolutePath());
+            if(filePathIntent != null){
 
-            mMediaPlayer.setSurface(s);
-            mMediaPlayer.prepare();
-            mMediaPlayer.setLooping(true);
+                mMediaPlayer.setDataSource(filePathIntent);
+
+                mMediaPlayer.setSurface(s);
+                mMediaPlayer.prepare();
+                mMediaPlayer.setLooping(true);
             /*mMediaPlayer.setOnBufferingUpdateListener(this);
             mMediaPlayer.setOnPreparedListener(this);
             mMediaPlayer.setOnVideoSizeChangedListener(this);*/
+                mMediaPlayer.setOnCompletionListener(this);
 
-            mMediaPlayer.setOnCompletionListener(this);
+                mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                mMediaPlayer.start();
+            }
 
-            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            mMediaPlayer.start();
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (SecurityException e) {
@@ -175,11 +184,10 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
      */
     void multiPartUpload() {
 
-        String filesToUploadString = filePathIntent.getAbsolutePath();
 
         try {
             String uploadID = new MultipartUploadRequest(this, Constants.URL_VIDEO_UPLOAD)
-                    .addFileToUpload(filesToUploadString, Constants.KEY_UPLOAD_VIDEO_PARAMETER)
+                    .addFileToUpload(filePathIntent, Constants.KEY_UPLOAD_VIDEO_PARAMETER)
                     .setNotificationConfig(getNotificationConfig(Constants.TEXT_UPLOAD_NOTIFICATION_TITLE))
                     .setCustomUserAgent(Constants.USER_AGENT)
                     .setAutoDeleteFilesAfterSuccessfulUpload(true)
@@ -189,9 +197,9 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
         } catch (FileNotFoundException exc) {
             exc.printStackTrace();
         } catch (IllegalArgumentException exc) {
-            Log.d("ERR", exc.getMessage() + " ");
+            Log.d(TAG, exc.getMessage() + " ");
         } catch (MalformedURLException exc) {
-            Log.d("ERR", exc.getMessage());
+            Log.d(TAG, exc.getMessage());
         }
     }
 
@@ -202,6 +210,10 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
      * @return Config
      */
     private UploadNotificationConfig getNotificationConfig(String title) {
+
+        Intent here = new Intent(this, MainVideoPlayUploadActivity.class) ;
+        here.putExtra(Constants.INTENT_ID, 0) ;
+
         return new UploadNotificationConfig()
                 .setIcon(R.drawable.ic_cast_on_light) //TODO: Replace with swisapp logo
                 .setTitle(title)
@@ -209,13 +221,13 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
                 .setCompletedMessage(getString(R.string.upload_success))
                 .setErrorMessage(getString(R.string.upload_error))
                 .setAutoClearOnSuccess(true)
-                .setClickIntent(new Intent(this, MainVideoPlayUploadActivity.class))
+                .setClickIntent(here)
                 .setClearOnAction(true)
                 .setRingToneEnabled(true);
     }
 
     private void saveExternal() {
-        File source = filePathIntent;
+        File source = new File(filePathIntent) ;
         File destination = FileHelper.createVideoFile(getApplicationContext(), FileHelper.generateVideoFileName(), FileHelper.TYPE_EXTERNAL);
 
         try {
@@ -226,7 +238,7 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
     }
 
     /**
-     * Copies file from the exisiting internal directory and saves it to the external app directory
+     * Copies file from the existing internal directory and saves it to the external app directory
      *
      * @param src Original file in root directory
      * @param dst New file in storage directory
@@ -265,15 +277,13 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
                 @Override
                 public void onError(String uploadId, Exception exception) {
                     super.onError(uploadId, exception);
-
-                    Log.i("TEST", "onError of Upload", exception) ;
                 }
 
                 @Override
                 public void onCompleted(String uploadId, int serverResponseCode, byte[] serverResponseBody) {
                     super.onCompleted(uploadId, serverResponseCode, serverResponseBody);
 
-                    Log.i("TEST", "Upload with ID " + uploadId
+                    Log.i(TAG, "Upload with ID " + uploadId
                             + " has been completed with HTTP " + serverResponseCode
                             + ". Response from server: "
                             + new String(serverResponseBody));

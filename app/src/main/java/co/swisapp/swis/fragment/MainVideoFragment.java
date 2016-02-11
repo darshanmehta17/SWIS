@@ -52,6 +52,7 @@ import co.swisapp.swis.R;
 import co.swisapp.swis.activity.MainVideoPlayUploadActivity;
 import co.swisapp.swis.customview.RecordButton;
 import co.swisapp.swis.utility.CameraHelper;
+import co.swisapp.swis.utility.Constants;
 import co.swisapp.swis.utility.FileHelper;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -73,7 +74,8 @@ public class MainVideoFragment extends android.app.Fragment implements
     private HandlerThread mBackgroundThread;
     private Handler mBackgroundHandler;
     public String mainFileName;
-    public File mainFilePath;
+    public File mainFile;
+    public String mainFilePath ;
     private Semaphore mCameraOpenCloseLock = new Semaphore(1);
     private RecordButton mButtonVideo;
 
@@ -461,9 +463,10 @@ public class MainVideoFragment extends android.app.Fragment implements
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
 
         mainFileName = FileHelper.generateVideoFileName() ;
-        mainFilePath = FileHelper.createVideoFile(activity, mainFileName, FileHelper.TYPE_INTERNAL);
+        mainFile = FileHelper.createVideoFile(activity, mainFileName, FileHelper.TYPE_INTERNAL);
+        mainFilePath = mainFile.getAbsolutePath() ;
 
-        mMediaRecorder.setOutputFile(mainFilePath.getAbsolutePath());
+        mMediaRecorder.setOutputFile(mainFilePath);
         mMediaRecorder.setVideoEncodingBitRate(10000000);
         mMediaRecorder.setVideoFrameRate(15);
         mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
@@ -510,7 +513,8 @@ public class MainVideoFragment extends android.app.Fragment implements
         }
         try{
             Intent previewFragment = new Intent(getActivity(), MainVideoPlayUploadActivity.class);
-            previewFragment.putExtra("filePath", mainFilePath);
+            previewFragment.putExtra(Constants.INTENT_FILEPATH_PARAM, mainFilePath);
+            previewFragment.putExtra(Constants.INTENT_ID, 1) ;
             startActivity(previewFragment);
         }catch (Throwable th){
             startPreview();
