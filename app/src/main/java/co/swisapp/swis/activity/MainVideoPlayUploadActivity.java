@@ -30,6 +30,7 @@ import java.nio.channels.FileChannel;
 
 import co.swisapp.swis.BuildConfig;
 import co.swisapp.swis.R;
+import co.swisapp.swis.utility.Constants;
 import co.swisapp.swis.utility.FileHelper;
 import co.swisapp.swis.utility.UploadUtils;
 
@@ -40,7 +41,6 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
     private TextureView mPreview;
     private ImageButton saveFileButton;
     private ImageButton uploadFile;
-    private static final String USER_AGENT = "device-android-" + BuildConfig.VERSION_NAME;
     private File filePathIntent;
     private boolean isPlaying = true ;
 
@@ -55,8 +55,8 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
         saveFileButton.setOnClickListener(this);
         mPreview.setOnClickListener(this);
 
-        Intent i = getIntent();
-        filePathIntent = (File) i.getExtras().get("filePath");
+        Intent intent = getIntent();
+        filePathIntent = (File) intent.getExtras().get("filePath");
 
 
     }
@@ -147,14 +147,12 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
                 multiPartUpload();
                 break;
             case R.id.play_upload_ibtn_save:
-                Thread thread = new Thread() {
+                new Thread() {
                     @Override
                     public void run() {
                         saveExternal();
-
                     }
-                };
-                thread.start();
+                }.start();
                 break;
             case R.id.play_upload_ibtn_location:
                 break;
@@ -176,21 +174,17 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
      * Upload service.
      */
     void multiPartUpload() {
-        final String filesToUploadString = filePathIntent.getAbsolutePath();
-        final String filename = getFilename(filesToUploadString);
 
-        final String serverUrlString = "https://swis-vuln-1.c9users.io/api/photo";
-        final String paramNameString = filename;
+        String filesToUploadString = filePathIntent.getAbsolutePath();
 
         try {
-            String uploadID = new MultipartUploadRequest(this, serverUrlString)
-                    .addFileToUpload(filesToUploadString, paramNameString)
-                    .setNotificationConfig(getNotificationConfig(filename))
-                    .setCustomUserAgent(USER_AGENT)
+            String uploadID = new MultipartUploadRequest(this, Constants.URL_VIDEO_UPLOAD)
+                    .addFileToUpload(filesToUploadString, Constants.KEY_UPLOAD_VIDEO_PARAMETER)
+                    .setNotificationConfig(getNotificationConfig(Constants.TEXT_UPLOAD_NOTIFICATION_TITLE))
+                    .setCustomUserAgent(Constants.USER_AGENT)
                     .setAutoDeleteFilesAfterSuccessfulUpload(true)
                     .setUsesFixedLengthStreamingMode(true)
                     .setMaxRetries(3)
-                    .addParameter("file", filename)
                     .startUpload();
         } catch (FileNotFoundException exc) {
             exc.printStackTrace();
@@ -204,13 +198,13 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
     /**
      * Setting the persistent notification when the upload takes place.
      *
-     * @param filename header name
+     * @param title header name
      * @return Config
      */
-    private UploadNotificationConfig getNotificationConfig(String filename) {
+    private UploadNotificationConfig getNotificationConfig(String title) {
         return new UploadNotificationConfig()
                 .setIcon(R.drawable.ic_cast_on_light) //TODO: Replace with swisapp logo
-                .setTitle(filename)
+                .setTitle(title)
                 .setInProgressMessage(getString(R.string.uploading))
                 .setCompletedMessage(getString(R.string.upload_success))
                 .setErrorMessage(getString(R.string.upload_error))
@@ -249,13 +243,6 @@ public class MainVideoPlayUploadActivity extends AppCompatActivity implements
         in.close();
         out.close();
         out.close();
-    }
-
-    private String getFilename(String filepath) {
-        if (filepath == null)
-            return null;
-        final String[] filepathParts = filepath.split("/");
-        return filepathParts[filepathParts.length - 1];
     }
 
     private final UploadUtils uploadServiceBroadcastReceiver = new

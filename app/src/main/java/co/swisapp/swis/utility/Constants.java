@@ -2,7 +2,16 @@ package co.swisapp.swis.utility;
 
 import android.os.Build;
 
-public class Constants {
+import co.swisapp.swis.BuildConfig;
+
+public abstract class Constants {
+
+    public static final String BASE_URL = "https://swis-vuln-1.c9users.io";
+
+    public static final String USER_AGENT = "device-android-" + BuildConfig.VERSION_NAME;
+
+    public static final String URL_API_PREFIX = BASE_URL + "/api";
+    public static final String URL_VIDEO_UPLOAD = URL_API_PREFIX + "/upload";
 
 
     public static final int VALID = 0;
@@ -19,7 +28,8 @@ public class Constants {
     public static final String PASSWORD = "password" ;
     public static final String TAG = "SWIS Logcat TAG " ;
 
-    public static String PACKAGE_NAME ;
+    public static final String  KEY_UPLOAD_VIDEO_PARAMETER = "video";
 
+    public static final String TEXT_UPLOAD_NOTIFICATION_TITLE = "Uploading";
 
 }

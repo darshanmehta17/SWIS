@@ -68,8 +68,6 @@ public class MainSessionActivity extends FragmentActivity implements ViewPager.O
 
     private void initialize(){
 
-        Constants.PACKAGE_NAME = getApplicationContext().getPackageName();
-
         viewPager = (ViewPager) findViewById(R.id.main_pager);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }

@@ -1,22 +1,14 @@
 package co.swisapp.swis;
 
-import android.app.Application;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
-import android.util.Base64;
-import android.util.Log;
+import android.support.multidex.MultiDexApplication;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
-public class MainApplication  extends Application{
+public class MainApplication  extends MultiDexApplication{
 
     private RequestQueue requestQueue ;
     private static MainApplication mainApplication ;
