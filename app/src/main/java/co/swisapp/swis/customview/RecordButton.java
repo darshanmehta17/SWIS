@@ -354,7 +354,7 @@ public class RecordButton extends View {
         return mPath;
     }
 
-    public Path drawRoundedRect(float left, float top, float right, float bottom, float rx, float ry) {
+    private Path drawRoundedRect(float left, float top, float right, float bottom, float rx, float ry) {
         Path path = new Path();
         if (rx < 0) rx = 0;
         if (ry < 0) ry = 0;

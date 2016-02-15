@@ -6,7 +6,7 @@ import android.view.Surface;
 
 public class CameraHelper {
 
-    public static boolean isRecording ;
+    private static boolean isRecording ;
 
     /**
      * SparseIntArray for referencing orientations with respect to their integer value.
@@ -19,11 +19,11 @@ public class CameraHelper {
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
 
-    public static void isRecordingSetter(boolean val){
-        isRecording = val ;
+    public static boolean isRecording() {
+        return isRecording;
     }
 
-    public static boolean isRecordingGetter(){
-        return isRecording ;
+    public static void setIsRecording(boolean isRecording) {
+        CameraHelper.isRecording = isRecording;
     }
 }

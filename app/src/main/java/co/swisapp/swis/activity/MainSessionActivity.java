@@ -100,7 +100,7 @@ public class MainSessionActivity extends FragmentActivity implements ViewPager.O
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
         }
-        if(position!=1 && CameraHelper.isRecordingGetter()){
+        if(position!=1 && CameraHelper.isRecording()){
             MainVideoFragment.FragmentChangeHandler();
         }
     }

@@ -22,7 +22,10 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
 import android.media.MediaRecorder;
+import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -64,20 +67,34 @@ public class MainVideoFragment extends android.app.Fragment implements
     private static final String FRAGMENT_DIALOG = "dialog";
 
     private TextureView textureView;
+
     private CameraDevice mCameraDevice;
+
     private CameraCaptureSession mPreviewSession;
 
     private Size mPreviewSize;
     private Size mVideoSize;
+
     private CaptureRequest.Builder mPreviewBuilder;
-    private static MediaRecorder mMediaRecorder;
+
+    private MediaRecorder mMediaRecorder;
+
     private HandlerThread mBackgroundThread;
     private Handler mBackgroundHandler;
+
     public String mainFileName;
-    public File mainFile;
     public String mainFilePath ;
+
+    public File mainFile;
+
     private Semaphore mCameraOpenCloseLock = new Semaphore(1);
-    private RecordButton mButtonVideo;
+
+    private RecordButton recordButton;
+
+    private SoundPool soundPool;
+
+    private int startSound;
+    private int stopSound;
 
     /**
      * List of permissions to be asked during runtime on API 23 devices.
@@ -176,33 +193,56 @@ public class MainVideoFragment extends android.app.Fragment implements
 
         initialize(view);
 
-        mButtonVideo.setOnStartRecordListener(this);
-        mButtonVideo.setOnStopRecordListener(this);
+        recordButton.setOnStartRecordListener(this);
+        recordButton.setOnStopRecordListener(this);
     }
 
     private void initialize(View view){
         textureView = (TextureView) view.findViewById(R.id.main_video_texture);
-        mButtonVideo = (RecordButton) view.findViewById(R.id.video_record_button);
+
+        recordButton = (RecordButton) view.findViewById(R.id.video_record_button);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+
         startBackgroundThread();
+
         if (textureView.isAvailable()) {
             openCamera(textureView.getWidth(), textureView.getHeight());
         } else {
             textureView.setSurfaceTextureListener(mSurfaceTextureListener);
         }
+
+
+        soundPool = new SoundPool.Builder()
+                .setMaxStreams(2)
+                .setAudioAttributes(new AudioAttributes.Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                        .setLegacyStreamType(AudioManager.STREAM_MUSIC)
+                        .setUsage(AudioAttributes.USAGE_GAME)
+                        .build()).build();
+
+        startSound = soundPool.load(getActivity(), R.raw.shutter_start, 1);
+        stopSound = soundPool.load(getActivity(), R.raw.shutter_stop, 1);
+
     }
 
     /**
-     * This function must release the camera so that any other application is capable of using it.
+     * This function must release the resources that it had captured (like camera, soundpool)
+     * so that other applications can use them.
      */
     @Override
-    public void onPause() {
+    public void onPause(){
         closeCamera();
+
         stopBackgroundThread();
+
+        if(soundPool != null) {
+            soundPool.release();
+        }
+
         super.onPause();
     }
 
@@ -375,8 +415,6 @@ public class MainVideoFragment extends android.app.Fragment implements
         }
     }
 
-
-
     private void closeCamera() {
         try {
             mCameraOpenCloseLock.acquire();
@@ -484,14 +522,34 @@ public class MainVideoFragment extends android.app.Fragment implements
          */
     }
 
-
     @Override
     public void onStartRecord() {
         try {
-            CameraHelper.isRecordingSetter(true);
+            if (soundPool != null) {
+                AudioManager audioManager = (AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE);
+
+                float curVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                float maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                float leftVolume = curVolume/maxVolume;
+                float rightVolume = curVolume/maxVolume;
+
+                int priority = 1;
+                int no_loop = 0;
+
+                float normal_playback_rate = 1f;
+
+                soundPool.play(startSound, leftVolume, rightVolume, priority, no_loop, normal_playback_rate);
+            }
+
+            CameraHelper.setIsRecording(true);
             mMediaRecorder.start();
+
         } catch (IllegalStateException e) {
             e.printStackTrace();
+
+            CameraHelper.setIsRecording(false);
+
+            recordButton.callOnClick();
         }
     }
 
@@ -503,20 +561,34 @@ public class MainVideoFragment extends android.app.Fragment implements
     @Override
     public void onStopRecord() {
 
-        CameraHelper.isRecordingSetter(false);
+        CameraHelper.setIsRecording(false);
+
         mMediaRecorder.stop();
         mMediaRecorder.reset();
-        Activity activity = getActivity();
-        if (null != activity) {
-            Toast.makeText(activity, "Video saved: " + mainFileName,
-                    Toast.LENGTH_SHORT).show();
+
+        if (soundPool != null) {
+            AudioManager audioManager = (AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE);
+
+            float curVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+            float maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+
+            float leftVolume = curVolume / maxVolume;
+            float rightVolume = curVolume / maxVolume;
+
+            int priority = 1;
+            int no_loop = 0;
+
+            float normal_playback_rate = 1f;
+
+            soundPool.play(stopSound, leftVolume, rightVolume, priority, no_loop, normal_playback_rate);
         }
-        try{
+
+        try {
             Intent previewFragment = new Intent(getActivity(), MainVideoPlayUploadActivity.class);
             previewFragment.putExtra(Constants.INTENT_FILEPATH_PARAM, mainFilePath);
             previewFragment.putExtra(Constants.INTENT_ID, 1) ;
             startActivity(previewFragment);
-        }catch (Throwable th){
+        } catch (Throwable th) {
             startPreview();
         }
     }
