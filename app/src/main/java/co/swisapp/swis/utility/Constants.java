@@ -6,7 +6,7 @@ import co.swisapp.swis.BuildConfig;
 
 public abstract class Constants {
 
-    public static final String BASE_URL = "https://swis-vuln-1.c9users.io";
+    public static final String BASE_URL = "https://swis-vuln.c9users.io";
 
     public static final String USER_AGENT = "device-android-" + BuildConfig.VERSION_NAME;
 

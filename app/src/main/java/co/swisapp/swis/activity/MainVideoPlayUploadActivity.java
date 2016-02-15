@@ -36,6 +36,7 @@ import co.swisapp.swis.utility.UploadUtils;
 public class MainVideoPlayUploadActivity extends AppCompatActivity implements
         TextureView.SurfaceTextureListener, MediaPlayer.OnCompletionListener, View.OnClickListener{
 
+
     private MediaPlayer mMediaPlayer;
     private TextureView mPreview;
     private ImageButton saveFileButton;
